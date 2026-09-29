@@ -1,0 +1,24 @@
+{
+  "name": "society-complaint-triage-root",
+  "version": "1.0.0",
+  "description": "Society Complaint Triage - Full-stack Housing Society Complaint Management",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix server run dev & npm --prefix client run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "start:server": "npm --prefix server start",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "build:client": "npm --prefix client run build"
+  },
+  "keywords": [
+    "complaint-triage",
+    "housing-society",
+    "ai-triage",
+    "react",
+    "vite",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC"
+}

@@ -39,6 +39,9 @@ export const CommitteeDashboard = () => {
     resolved: 0
   });
 
+  const [clusters, setClusters] = useState([]);
+  const [selectedClusterId, setSelectedClusterId] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -54,14 +57,16 @@ export const CommitteeDashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch complaints and summary stats concurrently
-      const [complaintsData, statsData] = await Promise.all([
+      // Fetch complaints, summary stats, and clusters concurrently
+      const [complaintsData, statsData, clustersData] = await Promise.all([
         api.getComplaints(),
-        api.getStats()
+        api.getStats(),
+        api.getClusters()
       ]);
 
       setComplaints(complaintsData);
       setStats(statsData);
+      setClusters(clustersData || []);
     } catch (err) {
       setError(err.message || 'Failed to load committee data');
     } finally {
@@ -80,16 +85,25 @@ export const CommitteeDashboard = () => {
       setComplaints((prev) =>
         prev.map((c) => (c.id === id ? { ...c, status: updated.status } : c))
       );
-      // Refresh statistics
-      const newStats = await api.getStats();
+      // Refresh statistics & clusters
+      const [newStats, newClusters] = await Promise.all([
+        api.getStats(),
+        api.getClusters()
+      ]);
       setStats(newStats);
+      setClusters(newClusters || []);
     } catch (err) {
       alert(`Could not update status: ${err.message}`);
     }
   };
 
   // Filter complaints client-side for ultra-fast UI response
+  const selectedCluster = clusters.find((cl) => cl.cluster_id === selectedClusterId);
   const filteredComplaints = complaints.filter((c) => {
+    const matchesCluster =
+      !selectedClusterId ||
+      c.cluster_id === selectedClusterId ||
+      (selectedCluster && selectedCluster.complaint_ids && selectedCluster.complaint_ids.includes(c.id));
     const matchesStatus = statusFilter === 'ALL' || c.status === statusFilter;
     const matchesCategory = categoryFilter === 'ALL' || c.category === categoryFilter;
     const matchesUrgency = urgencyFilter === 'ALL' || c.urgency === urgencyFilter;
@@ -103,11 +117,12 @@ export const CommitteeDashboard = () => {
       (c.id && c.id.toLowerCase().includes(q)) ||
       (c.ai_summary && c.ai_summary.toLowerCase().includes(q));
 
-    return matchesStatus && matchesCategory && matchesUrgency && matchesSearch;
+    return matchesCluster && matchesStatus && matchesCategory && matchesUrgency && matchesSearch;
   });
 
   // Handle quick click from sidebar or stat cards
   const handleQuickStatClick = (filterType, value) => {
+    setSelectedClusterId(null);
     if (filterType === 'urgency') {
       setUrgencyFilter(value);
       setStatusFilter('ALL');
@@ -231,6 +246,135 @@ export const CommitteeDashboard = () => {
           />
         </div>
 
+        {/* COMPLAINT CLUSTERS (Phase 3 Rule-Based Grouping) */}
+        {clusters.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-purple-100 text-purple-700">
+                  <Layers className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Complaint Clusters
+                    </h2>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                      {clusters.length} Active {clusters.length === 1 ? 'Cluster' : 'Clusters'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Recognize systemic issues affecting multiple residents in one place
+                  </p>
+                </div>
+              </div>
+
+              {selectedClusterId && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedClusterId(null)}
+                  className="text-xs text-purple-700 hover:text-purple-900 font-semibold underline"
+                >
+                  Show All Complaints
+                </button>
+              )}
+            </div>
+
+            {/* Clusters Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {clusters.map((cluster) => {
+                const isSelected = selectedClusterId === cluster.cluster_id;
+                const isCritical = cluster.urgency === 'CRITICAL';
+                const isHigh = cluster.urgency === 'HIGH';
+
+                // Dot indicator color
+                const dotColor = isCritical
+                  ? 'bg-red-500'
+                  : isHigh
+                  ? 'bg-amber-500'
+                  : 'bg-blue-500';
+
+                return (
+                  <div
+                    key={cluster.cluster_id}
+                    className={`rounded-xl border p-4 transition-all flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-purple-500 ring-2 ring-purple-100 bg-purple-50/20 shadow-sm'
+                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/30'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Row: Category + Location and Urgency */}
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="font-bold text-xs tracking-wider text-slate-900 uppercase flex items-center gap-1.5">
+                          <span className={`w-2.5 h-2.5 rounded-full ${dotColor} ${isCritical ? 'animate-pulse' : ''}`} />
+                          {cluster.category} {cluster.title.includes('Wing') ? `— ${cluster.title.split(' ')[0]}` : cluster.title.includes('Tower') ? `— ${cluster.title.split(' ')[0]} ${cluster.title.split(' ')[1]}` : ''}
+                        </span>
+                        <UrgencyBadge urgency={cluster.urgency} size="sm" />
+                      </div>
+
+                      {/* Complaint count & title */}
+                      <p className="text-xs font-semibold text-slate-600">
+                        {cluster.complaint_count} related complaints
+                      </p>
+                      <h3 className="text-sm font-bold text-slate-900 mt-0.5">
+                        {cluster.title}
+                      </h3>
+
+                      {/* Affected flats list */}
+                      {cluster.affected_flats && cluster.affected_flats.length > 0 && (
+                        <div className="mt-2.5 text-xs text-slate-600 flex items-center flex-wrap gap-1">
+                          <span className="text-[11px] text-slate-400 font-medium mr-0.5">Flats:</span>
+                          <span className="font-medium text-slate-800">
+                            {cluster.affected_flats.join(' • ')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer Button: View Complaints */}
+                    <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between">
+                      <span className="text-[11px] font-mono text-slate-400">
+                        #{cluster.cluster_id}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedClusterId(isSelected ? null : cluster.cluster_id)}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+                          isSelected
+                            ? 'bg-purple-600 text-white shadow-xs'
+                            : 'bg-white border border-slate-300 text-slate-700 hover:border-purple-300 hover:text-purple-700'
+                        }`}
+                      >
+                        {isSelected ? 'Viewing Filtered' : 'View Complaints'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Active Cluster Filter Indicator Banner */}
+        {selectedClusterId && (
+          <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl flex items-center justify-between text-xs text-purple-900">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-purple-600" />
+              <span>
+                Filtered by Cluster: <strong>{selectedClusterId}</strong> ({filteredComplaints.length} tickets matching)
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedClusterId(null)}
+              className="text-xs font-bold text-purple-700 hover:text-purple-900 underline"
+            >
+              Show All Complaints
+            </button>
+          </div>
+        )}
+
         {/* Filters and Search Control Panel */}
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3.5">
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
@@ -330,7 +474,7 @@ export const CommitteeDashboard = () => {
             </select>
 
             {/* Reset Filters */}
-            {(statusFilter !== 'ALL' || categoryFilter !== 'ALL' || urgencyFilter !== 'ALL' || searchTerm) && (
+            {(statusFilter !== 'ALL' || categoryFilter !== 'ALL' || urgencyFilter !== 'ALL' || searchTerm || selectedClusterId) && (
               <button
                 type="button"
                 onClick={() => {
@@ -338,6 +482,7 @@ export const CommitteeDashboard = () => {
                   setCategoryFilter('ALL');
                   setUrgencyFilter('ALL');
                   setSearchTerm('');
+                  setSelectedClusterId(null);
                 }}
                 className="text-xs text-blue-600 hover:text-blue-800 font-medium underline ml-auto"
               >
@@ -364,6 +509,7 @@ export const CommitteeDashboard = () => {
               setCategoryFilter('ALL');
               setUrgencyFilter('ALL');
               setSearchTerm('');
+              setSelectedClusterId(null);
             }}
           />
         ) : viewMode === 'cards' ? (

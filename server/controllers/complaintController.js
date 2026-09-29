@@ -11,13 +11,14 @@ const clusteringService = require('../services/clustering');
 // @route   GET /api/complaints
 const getComplaints = async (req, res, next) => {
   try {
-    const { status, category, urgency, flat_number, search } = req.query;
+    const { status, category, urgency, flat_number, search, cluster_id } = req.query;
     const complaints = await ComplaintModel.getAll({
       status,
       category,
       urgency,
       flat_number,
-      search
+      search,
+      cluster_id
     });
 
     res.status(200).json({
@@ -181,11 +182,29 @@ const getStats = async (req, res, next) => {
   }
 };
 
+// @desc    Get complaint clusters summary
+// @route   GET /api/complaints/clusters
+const getClusters = async (req, res, next) => {
+  try {
+    const allComplaints = await ComplaintModel.getAll();
+    const summary = clusteringService.getClustersSummary(allComplaints);
+    res.status(200).json({
+      success: true,
+      count: summary.clusters.length,
+      unclustered_count: summary.unclusteredCount,
+      data: summary.clusters
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getComplaints,
   getComplaintById,
   createComplaint,
   updateComplaint,
   deleteComplaint,
-  getStats
+  getStats,
+  getClusters
 };

@@ -178,6 +178,9 @@ const ComplaintModel = {
         if (filters.flat_number) {
           query = query.ilike('flat_number', `%${filters.flat_number}%`);
         }
+        if (filters.cluster_id) {
+          query = query.eq('cluster_id', filters.cluster_id);
+        }
         if (filters.search) {
           query = query.or(`description.ilike.%${filters.search}%,resident_name.ilike.%${filters.search}%,flat_number.ilike.%${filters.search}%`);
         }
@@ -193,6 +196,20 @@ const ComplaintModel = {
     // In-Memory filtering
     let results = [...memoryComplaints];
 
+    if (filters.cluster_id) {
+      results = results.filter(c => {
+        if (c.cluster_id === filters.cluster_id) return true;
+        const match = filters.cluster_id.match(/^cl-([a-z]+)-([a-z])$/i);
+        if (match) {
+          const cat = match[1].toUpperCase();
+          const wing = match[2].toUpperCase();
+          const cCat = (c.category || '').toUpperCase();
+          const cFlat = (c.flat_number || '').toUpperCase();
+          return cCat === cat && cFlat.startsWith(wing);
+        }
+        return false;
+      });
+    }
     if (filters.status && filters.status !== 'ALL') {
       results = results.filter(c => c.status === filters.status);
     }

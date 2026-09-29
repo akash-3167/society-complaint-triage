@@ -41,6 +41,7 @@ class ApiService {
     if (filters.urgency && filters.urgency !== 'ALL') params.append('urgency', filters.urgency);
     if (filters.flat_number) params.append('flat_number', filters.flat_number);
     if (filters.search) params.append('search', filters.search);
+    if (filters.cluster_id) params.append('cluster_id', filters.cluster_id);
 
     const queryString = params.toString() ? `?${params.toString()}` : '';
     const res = await this.request(`/complaints${queryString}`);
@@ -82,6 +83,12 @@ class ApiService {
   async getStats() {
     const res = await this.request('/complaints/stats/summary');
     return res.data;
+  }
+
+  // Fetch complaint clusters summary
+  async getClusters() {
+    const res = await this.request('/complaints/clusters');
+    return res.data || [];
   }
 }
 

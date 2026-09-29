@@ -11,6 +11,9 @@ const { validateCreateComplaint, validateUpdateComplaint } = require('../middlew
 // Stats endpoint
 router.get('/stats/summary', complaintController.getStats);
 
+// Clusters endpoint
+router.get('/clusters', complaintController.getClusters);
+
 // Complaints CRUD endpoints
 router.route('/')
   .get(complaintController.getComplaints)

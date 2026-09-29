@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, User, Home, ArrowRight, Layers, Sparkles } from 'lucide-react';
+import { Calendar, User, Home, ArrowRight, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import UrgencyBadge from './UrgencyBadge';
 import CategoryBadge from './CategoryBadge';
@@ -75,12 +75,21 @@ export const ComplaintCard = ({
           {complaint.description}
         </p>
 
-        {/* AI Summary Preview if present */}
-        {complaint.ai_summary && (
-          <div className="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs text-slate-600 flex items-start gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
+        {/* AI Summary & Suggested Action */}
+        {(complaint.ai_summary || complaint.summary) && (
+          <div className="mt-3 p-2.5 rounded-lg bg-blue-50/50 border border-blue-100 text-xs text-slate-700 flex items-start gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
             <span className="line-clamp-2 italic">
-              <strong className="not-italic text-slate-700">AI Summary:</strong> {complaint.ai_summary}
+              <strong className="not-italic text-slate-800 font-semibold">AI Summary:</strong> {complaint.ai_summary || complaint.summary}
+            </span>
+          </div>
+        )}
+
+        {complaint.suggested_action && (
+          <div className="mt-1.5 p-2 rounded-lg bg-emerald-50/40 border border-emerald-100 text-xs text-slate-700 flex items-start gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+            <span className="line-clamp-2">
+              <strong className="text-slate-800 font-semibold">Suggested Action:</strong> {complaint.suggested_action}
             </span>
           </div>
         )}

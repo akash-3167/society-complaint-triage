@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import CategoryBadge from '../components/CategoryBadge';
+import UrgencyBadge from '../components/UrgencyBadge';
 
 export const SubmitComplaint = () => {
   const navigate = useNavigate();
@@ -134,18 +136,71 @@ export const SubmitComplaint = () => {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="text-base font-bold text-emerald-900">
-                  Complaint Lodged Successfully!
-                </h3>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="text-base font-bold text-emerald-900">
+                    Complaint Lodged Successfully!
+                  </h3>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                    AI analyzed
+                  </span>
+                </div>
+
                 <p className="text-xs sm:text-sm text-emerald-800 mt-1">
-                  Ticket ID: <strong className="font-mono">{successData.id}</strong> &bull; Assigned Category:{' '}
-                  <strong>{successData.category}</strong> ({successData.urgency} Urgency)
+                  Ticket ID: <strong className="font-mono bg-emerald-100/60 px-1.5 py-0.5 rounded">{successData.id}</strong> &bull; Flat <strong>{successData.flat_number}</strong>
                 </p>
-                {successData.ai_summary && (
-                  <p className="text-xs text-emerald-700 italic mt-2 bg-emerald-100/50 p-2 rounded">
-                    AI Summary: {successData.ai_summary}
-                  </p>
-                )}
+
+                {/* Structured AI Analysis Card */}
+                <div className="mt-4 p-4 rounded-xl bg-white border border-emerald-200 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-blue-600" />
+                      AI Analysis
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium">
+                      gemini-3.8-flash triage
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">Category</span>
+                      <div className="mt-1">
+                        <CategoryBadge category={successData.category} size="sm" />
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">Urgency</span>
+                      <div className="mt-1">
+                        <UrgencyBadge urgency={successData.urgency} size="sm" />
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">Language</span>
+                      <div className="mt-1">
+                        <span className="inline-flex items-center text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                          {successData.language || 'English'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block mb-1">Summary</span>
+                    <p className="text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100 italic leading-relaxed">
+                      "{successData.summary || successData.ai_summary}"
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block mb-1">Suggested Action</span>
+                    <p className="text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex items-start gap-1.5 leading-relaxed">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>{successData.suggested_action}</span>
+                    </p>
+                  </div>
+                </div>
+
                 <div className="mt-4 flex gap-3">
                   <button
                     type="button"
@@ -312,7 +367,7 @@ export const SubmitComplaint = () => {
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Submitting & Triaging...</span>
+                  <span>Analyzing your complaint...</span>
                 </>
               ) : (
                 <>

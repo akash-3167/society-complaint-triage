@@ -387,7 +387,7 @@ export const CommitteeDashboard = () => {
                     <th scope="col" className="px-4 py-3">Flat & Resident</th>
                     <th scope="col" className="px-4 py-3">Category</th>
                     <th scope="col" className="px-4 py-3">Urgency</th>
-                    <th scope="col" className="px-4 py-3">Description</th>
+                    <th scope="col" className="px-4 py-3">Description & AI Triage</th>
                     <th scope="col" className="px-4 py-3">Status</th>
                     <th scope="col" className="px-4 py-3">Cluster</th>
                     <th scope="col" className="px-4 py-3 text-right">Action</th>
@@ -406,8 +406,22 @@ export const CommitteeDashboard = () => {
                       <td className="px-4 py-3 whitespace-nowrap">
                         <UrgencyBadge urgency={c.urgency} size="sm" />
                       </td>
-                      <td className="px-4 py-3 max-w-xs truncate" title={c.description}>
-                        {c.description}
+                      <td className="px-4 py-3 max-w-sm">
+                        <div className="text-slate-800 line-clamp-1" title={c.description}>
+                          {c.description}
+                        </div>
+                        {(c.ai_summary || c.summary) && (
+                          <div className="text-[11px] text-blue-700 italic flex items-center gap-1 line-clamp-1 mt-0.5" title={c.ai_summary || c.summary}>
+                            <Sparkles className="w-3 h-3 text-blue-500 shrink-0" />
+                            <span>{c.ai_summary || c.summary}</span>
+                          </div>
+                        )}
+                        {c.suggested_action && (
+                          <div className="text-[10px] text-emerald-700 flex items-center gap-1 line-clamp-1 mt-0.5" title={c.suggested_action}>
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                            <span>Action: {c.suggested_action}</span>
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <select

@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Load environment variables from .env file
+// Load environment variables from root .env file
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 // Also fallback to server/.env if present
 dotenv.config();
@@ -14,9 +14,9 @@ const config = {
     anonKey: process.env.SUPABASE_ANON_KEY || '',
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || ''
   },
-  ai: {
-    apiKey: process.env.AI_API_KEY || '',
-    model: process.env.AI_MODEL || 'gemini-1.5-flash'
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || process.env.AI_API_KEY || '',
+    model: 'gemini-3.8-flash'
   }
 };
 

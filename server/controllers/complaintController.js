@@ -83,7 +83,8 @@ const createComplaint = async (req, res, next) => {
       category: triageResult.category,
       urgency: triageResult.urgency,
       language: triageResult.language,
-      ai_summary: triageResult.ai_summary,
+      ai_summary: triageResult.summary || triageResult.ai_summary,
+      summary: triageResult.summary || triageResult.ai_summary,
       suggested_action: triageResult.suggested_action,
       cluster_id: clusterResult.cluster_id || null,
       status: ComplaintModel.STATUS_ENUM.OPEN

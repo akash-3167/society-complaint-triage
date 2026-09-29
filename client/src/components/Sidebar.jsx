@@ -8,7 +8,8 @@ import {
   Layers, 
   HelpCircle,
   Building,
-  Bot
+  Bot,
+  UserCheck
 } from 'lucide-react';
 
 export const Sidebar = ({ 
@@ -20,6 +21,7 @@ export const Sidebar = ({
     { id: 'ALL', label: 'All Complaints', icon: LayoutDashboard, count: stats.total || 0 },
     { id: 'CRITICAL', label: 'Critical Urgency', icon: AlertCircle, count: stats.critical || 0, badgeColor: 'text-red-700 bg-red-50' },
     { id: 'OPEN', label: 'Open / Unassigned', icon: Clock, count: stats.open || 0, badgeColor: 'text-indigo-700 bg-indigo-50' },
+    { id: 'ASSIGNED', label: 'Assigned', icon: UserCheck, count: stats.assigned || 0, badgeColor: 'text-blue-700 bg-blue-50' },
     { id: 'IN_PROGRESS', label: 'In Progress', icon: Layers, count: stats.inProgress || 0, badgeColor: 'text-amber-700 bg-amber-50' },
     { id: 'RESOLVED', label: 'Resolved', icon: CheckCircle2, count: stats.resolved || 0, badgeColor: 'text-emerald-700 bg-emerald-50' },
   ];

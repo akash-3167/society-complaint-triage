@@ -26,6 +26,7 @@ import CategoryBadge from '../components/CategoryBadge';
 import LoadingState from '../components/LoadingState';
 import EmptyState from '../components/EmptyState';
 import Sidebar from '../components/Sidebar';
+import { SOCIETY_STAFF } from '../constants/staff';
 
 export const CommitteeDashboard = () => {
   const [complaints, setComplaints] = useState([]);
@@ -83,7 +84,7 @@ export const CommitteeDashboard = () => {
     try {
       const updated = await api.updateComplaint(id, { status: newStatus });
       setComplaints((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, status: updated.status } : c))
+        prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
       );
       // Refresh statistics & clusters
       const [newStats, newClusters] = await Promise.all([
@@ -94,6 +95,30 @@ export const CommitteeDashboard = () => {
       setClusters(newClusters || []);
     } catch (err) {
       alert(`Could not update status: ${err.message}`);
+    }
+  };
+
+  // Staff assignment handler for committee members
+  const handleAssign = async (id, staffName) => {
+    try {
+      const current = complaints.find((c) => c.id === id);
+      const newStatus = (!current?.status || current?.status === 'OPEN') && staffName ? 'ASSIGNED' : current?.status;
+      const updated = await api.updateComplaint(id, {
+        assigned_to: staffName || null,
+        status: newStatus
+      });
+      setComplaints((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
+      );
+      // Refresh statistics & clusters
+      const [newStats, newClusters] = await Promise.all([
+        api.getStats(),
+        api.getClusters()
+      ]);
+      setStats(newStats);
+      setClusters(newClusters || []);
+    } catch (err) {
+      alert(`Could not assign staff: ${err.message}`);
     }
   };
 
@@ -421,8 +446,38 @@ export const CommitteeDashboard = () => {
             </div>
           </div>
 
+          {/* Quick Status Filter Tabs (Phase 4 Workflow) */}
+          <div className="flex flex-wrap items-center gap-1.5 pb-2 border-b border-slate-100">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1">
+              Workflow Status:
+            </span>
+            {[
+              { id: 'ALL', label: 'ALL' },
+              { id: 'OPEN', label: 'OPEN' },
+              { id: 'ASSIGNED', label: 'ASSIGNED' },
+              { id: 'IN_PROGRESS', label: 'IN PROGRESS' },
+              { id: 'RESOLVED', label: 'RESOLVED' }
+            ].map((tab) => {
+              const isActive = statusFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setStatusFilter(tab.id)}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-600'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
           {/* Filter Dropdowns */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100 text-xs">
+          <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs">
             <span className="text-slate-400 font-semibold uppercase tracking-wider text-[11px] flex items-center gap-1">
               <Filter className="w-3.5 h-3.5" />
               Filters:
@@ -520,6 +575,7 @@ export const CommitteeDashboard = () => {
                 complaint={complaint}
                 isCommitteeView={true}
                 onStatusChange={handleStatusChange}
+                onAssign={handleAssign}
               />
             ))}
           </div>
@@ -534,6 +590,7 @@ export const CommitteeDashboard = () => {
                     <th scope="col" className="px-4 py-3">Category</th>
                     <th scope="col" className="px-4 py-3">Urgency</th>
                     <th scope="col" className="px-4 py-3">Description & AI Triage</th>
+                    <th scope="col" className="px-4 py-3">Assigned To</th>
                     <th scope="col" className="px-4 py-3">Status</th>
                     <th scope="col" className="px-4 py-3">Cluster</th>
                     <th scope="col" className="px-4 py-3 text-right">Action</th>
@@ -571,15 +628,45 @@ export const CommitteeDashboard = () => {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <select
-                          value={c.status}
-                          onChange={(e) => handleStatusChange(c.id, e.target.value)}
-                          className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-700"
+                          value={c.assigned_to || ''}
+                          onChange={(e) => handleAssign(c.id, e.target.value)}
+                          className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
+                          aria-label={`Assign staff for complaint ${c.id}`}
                         >
-                          <option value="OPEN">OPEN</option>
-                          <option value="ASSIGNED">ASSIGNED</option>
-                          <option value="IN_PROGRESS">IN_PROGRESS</option>
-                          <option value="RESOLVED">RESOLVED</option>
+                          <option value="">Unassigned</option>
+                          {SOCIETY_STAFF.map((staff) => (
+                            <option key={staff} value={staff}>
+                              {staff}
+                            </option>
+                          ))}
                         </select>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <select
+                            value={c.status}
+                            onChange={(e) => handleStatusChange(c.id, e.target.value)}
+                            className={`px-2 py-1 text-xs border rounded font-semibold focus:ring-1 focus:ring-blue-500 ${
+                              c.status === 'RESOLVED'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : c.status === 'IN_PROGRESS'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : c.status === 'ASSIGNED'
+                                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                : 'bg-white text-slate-700 border-slate-300'
+                            }`}
+                          >
+                            <option value="OPEN">OPEN</option>
+                            <option value="ASSIGNED">ASSIGNED</option>
+                            <option value="IN_PROGRESS">IN_PROGRESS</option>
+                            <option value="RESOLVED">RESOLVED</option>
+                          </select>
+                          {c.status === 'RESOLVED' && (
+                            <span className="text-emerald-600 font-bold text-xs" title="Resolved">
+                              ✓
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         {c.cluster_id ? (

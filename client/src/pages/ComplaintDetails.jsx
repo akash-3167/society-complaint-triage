@@ -22,6 +22,7 @@ import StatusBadge from '../components/StatusBadge';
 import UrgencyBadge from '../components/UrgencyBadge';
 import CategoryBadge from '../components/CategoryBadge';
 import LoadingState from '../components/LoadingState';
+import { SOCIETY_STAFF } from '../constants/staff';
 
 export const ComplaintDetails = () => {
   const { id } = useParams();
@@ -328,14 +329,17 @@ export const ComplaintDetails = () => {
               <div className="space-y-1.5 pt-1">
                 <span className="text-[11px] font-medium text-slate-400 block">Quick Assign Staff:</span>
                 <div className="flex flex-wrap gap-1.5">
-                  {['Ramesh (Plumber)', 'Suresh (Electrician)', 'Johnson Lifts AMC', 'Housekeeping Lead'].map((staff) => (
+                  {SOCIETY_STAFF.map((staff) => (
                     <button
                       key={staff}
                       type="button"
-                      onClick={() => setAssignedTo(staff)}
-                      className="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px]"
+                      onClick={() => {
+                        setAssignedTo(staff);
+                        if (status === 'OPEN') setStatus('ASSIGNED');
+                      }}
+                      className="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px] font-medium"
                     >
-                      {staff.split(' ')[0]}
+                      {staff}
                     </button>
                   ))}
                 </div>

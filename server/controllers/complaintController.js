@@ -120,7 +120,12 @@ const updateComplaint = async (req, res, next) => {
       });
     }
 
-    const updated = await ComplaintModel.update(id, req.body);
+    const updates = { ...req.body };
+    if (updates.assigned_to && (!updates.status || updates.status === ComplaintModel.STATUS_ENUM.OPEN)) {
+      updates.status = ComplaintModel.STATUS_ENUM.ASSIGNED;
+    }
+
+    const updated = await ComplaintModel.update(id, updates);
 
     res.status(200).json({
       success: true,

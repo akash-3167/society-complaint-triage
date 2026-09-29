@@ -1,9 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, User, Home, ArrowRight, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
+import { 
+  Calendar, 
+  User, 
+  Home, 
+  ArrowRight, 
+  Layers, 
+  Sparkles, 
+  CheckCircle2, 
+  Wrench,
+  UserCheck
+} from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import UrgencyBadge from './UrgencyBadge';
 import CategoryBadge from './CategoryBadge';
+import { SOCIETY_STAFF } from '../constants/staff';
 
 // Helper to format ISO timestamp into readable string
 const formatDate = (isoString) => {
@@ -26,12 +37,19 @@ export const ComplaintCard = ({
   complaint,
   showActions = true,
   onStatusChange,
+  onAssign,
   isCommitteeView = false
 }) => {
   if (!complaint) return null;
 
+  const isResolved = complaint.status === 'RESOLVED';
+
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 transition-all shadow-sm hover:shadow-md flex flex-col justify-between">
+    <div className={`rounded-xl border p-5 transition-all shadow-sm hover:shadow-md flex flex-col justify-between ${
+      isResolved 
+        ? 'bg-slate-50/60 border-slate-200' 
+        : 'bg-white border-slate-200 hover:border-slate-300'
+    }`}>
       <div>
         {/* Top Header Row: Flat, Resident, Date, Badges */}
         <div className="flex flex-wrap items-start justify-between gap-2.5 pb-3 border-b border-slate-100">
@@ -93,34 +111,101 @@ export const ComplaintCard = ({
             </span>
           </div>
         )}
+
+        {/* Resolution Banner (Visible when Resolved) */}
+        {isResolved ? (
+          <div className="mt-3 p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between flex-wrap gap-2">
+            <span className="font-bold flex items-center gap-1.5 text-emerald-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              ✅ RESOLVED
+            </span>
+            {complaint.assigned_to && (
+              <span className="text-[11px] text-emerald-700 font-medium">
+                Assigned to: <strong className="font-semibold text-emerald-900">{complaint.assigned_to}</strong>
+              </span>
+            )}
+          </div>
+        ) : complaint.assigned_to ? (
+          /* Assignment Display when Active */
+          <div className="mt-2.5 p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-center gap-1.5">
+            <Wrench className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span>Assigned to: <strong className="font-semibold text-slate-900">{complaint.assigned_to}</strong></span>
+          </div>
+        ) : null}
       </div>
 
       {/* Footer Info & Actions */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-        <div className="flex items-center gap-1">
-          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-          <span>{formatDate(complaint.created_at)}</span>
-        </div>
+      <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col gap-2.5">
+        {/* Committee Quick Action Controls */}
+        {isCommitteeView && (
+          <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 space-y-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-xs">
+              {/* Staff Assignment Dropdown */}
+              <div className="flex-1 flex items-center gap-1.5">
+                <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <select
+                  value={complaint.assigned_to || ''}
+                  onChange={(e) => onAssign && onAssign(complaint.id, e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
+                  aria-label={`Assign staff for complaint ${complaint.id}`}
+                >
+                  <option value="">Assign Staff...</option>
+                  {SOCIETY_STAFF.map((staff) => (
+                    <option key={staff} value={staff}>
+                      {staff}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <div className="flex items-center gap-2">
-          {isCommitteeView && onStatusChange && (
-            <select
-              value={complaint.status}
-              onChange={(e) => onStatusChange(complaint.id, e.target.value)}
-              className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-700 focus:ring-1 focus:ring-blue-500"
-              aria-label={`Change status for complaint ${complaint.id}`}
-            >
-              <option value="OPEN">Open</option>
-              <option value="ASSIGNED">Assigned</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="RESOLVED">Resolved</option>
-            </select>
-          )}
+              {/* Status Change Dropdown */}
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={complaint.status}
+                  onChange={(e) => onStatusChange && onStatusChange(complaint.id, e.target.value)}
+                  className={`px-2 py-1 text-xs border rounded font-semibold focus:ring-1 focus:ring-blue-500 ${
+                    complaint.status === 'RESOLVED'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : complaint.status === 'IN_PROGRESS'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : complaint.status === 'ASSIGNED'
+                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                      : 'bg-white text-slate-700 border-slate-300'
+                  }`}
+                  aria-label={`Change status for complaint ${complaint.id}`}
+                >
+                  <option value="OPEN">OPEN</option>
+                  <option value="ASSIGNED">ASSIGNED</option>
+                  <option value="IN_PROGRESS">IN_PROGRESS</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                </select>
+
+                {!isResolved && onStatusChange && (
+                  <button
+                    type="button"
+                    onClick={() => onStatusChange(complaint.id, 'RESOLVED')}
+                    className="px-2 py-1 text-[11px] font-semibold rounded bg-emerald-600 hover:bg-emerald-700 text-white transition shrink-0"
+                    title="Quick Mark Resolved"
+                  >
+                    ✓ Resolve
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Date and Details Link */}
+        <div className="flex items-center justify-between text-xs text-slate-500">
+          <div className="flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <span>{formatDate(complaint.created_at)}</span>
+          </div>
 
           {showActions && (
             <Link
               to={`/complaints/${complaint.id}`}
-              className="inline-flex items-center gap-1 text-blue-600 font-medium hover:text-blue-800 transition py-1 px-2 rounded hover:bg-blue-50"
+              className="inline-flex items-center gap-1 text-blue-600 font-medium hover:text-blue-800 transition py-0.5 px-1.5 rounded hover:bg-blue-50 text-xs"
             >
               <span>Details</span>
               <ArrowRight className="w-3.5 h-3.5" />

@@ -8,8 +8,22 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 class ApiService {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
+
+    // Retrieve active session token from localStorage
+    let token = null;
+    try {
+      const savedUser = localStorage.getItem('society_triage_user');
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        token = parsed.token;
+      }
+    } catch (e) {
+      // Ignore parse errors
+    }
+
     const headers = {
       'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...options.headers,
     };
 
@@ -89,6 +103,15 @@ class ApiService {
   async getClusters() {
     const res = await this.request('/complaints/clusters');
     return res.data || [];
+  }
+
+  // Demo login
+  async login(payload) {
+    const res = await this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return res;
   }
 }
 

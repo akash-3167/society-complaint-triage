@@ -9,7 +9,9 @@ import {
   Sparkles, 
   CheckCircle2, 
   Wrench,
-  UserCheck
+  UserCheck,
+  UserPlus,
+  AlertCircle
 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import UrgencyBadge from './UrgencyBadge';
@@ -38,6 +40,7 @@ export const ComplaintCard = ({
   showActions = true,
   onStatusChange,
   onAssign,
+  onOpenAssign,
   isCommitteeView = false
 }) => {
   if (!complaint) return null;
@@ -127,9 +130,40 @@ export const ComplaintCard = ({
           </div>
         ) : complaint.assigned_to ? (
           /* Assignment Display when Active */
-          <div className="mt-2.5 p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-center gap-1.5">
-            <Wrench className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span>Assigned to: <strong className="font-semibold text-slate-900">{complaint.assigned_to}</strong></span>
+          <div className="mt-2.5 p-2 rounded-lg bg-blue-50/60 border border-blue-200/80 text-xs text-blue-900 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-medium">
+              <Wrench className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>Assigned to: <strong className="font-semibold text-slate-900">{complaint.assigned_to}</strong></span>
+            </div>
+            {isCommitteeView && onOpenAssign && (
+              <button
+                type="button"
+                onClick={() => onOpenAssign(complaint)}
+                className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold underline ml-2"
+                title="Reassign staff"
+              >
+                Change
+              </button>
+            )}
+          </div>
+        ) : isCommitteeView ? (
+          /* Visible prompt for OPEN / unassigned complaints */
+          <div className="mt-2.5 p-2 rounded-lg bg-amber-50/80 border border-amber-200/90 text-xs text-amber-900 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-medium text-amber-800">
+              <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>Status: <strong>OPEN</strong> (Awaiting Staff)</span>
+            </div>
+            {onOpenAssign && (
+              <button
+                type="button"
+                onClick={() => onOpenAssign(complaint)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-xs transition"
+                title="Assign staff to open complaint"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Assign Staff</span>
+              </button>
+            )}
           </div>
         ) : null}
       </div>
@@ -140,22 +174,50 @@ export const ComplaintCard = ({
         {isCommitteeView && (
           <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 space-y-2">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-xs">
-              {/* Staff Assignment Dropdown */}
+              {/* Staff Assignment Action */}
               <div className="flex-1 flex items-center gap-1.5">
-                <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                <select
-                  value={complaint.assigned_to || ''}
-                  onChange={(e) => onAssign && onAssign(complaint.id, e.target.value)}
-                  className="w-full px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
-                  aria-label={`Assign staff for complaint ${complaint.id}`}
-                >
-                  <option value="">Assign Staff...</option>
-                  {SOCIETY_STAFF.map((staff) => (
-                    <option key={staff} value={staff}>
-                      {staff}
-                    </option>
-                  ))}
-                </select>
+                {onOpenAssign ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenAssign(complaint)}
+                    className={`w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition ${
+                      complaint.assigned_to 
+                        ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50' 
+                        : 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 shadow-xs'
+                    }`}
+                    title={complaint.assigned_to ? `Assigned to ${complaint.assigned_to} - Click to change` : 'Click to assign staff'}
+                  >
+                    {complaint.assigned_to ? (
+                      <>
+                        <UserCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                        <span className="truncate">{complaint.assigned_to}</span>
+                        <span className="text-[10px] text-slate-400 font-normal ml-0.5">(edit)</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>Assign Staff...</span>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1.5 w-full">
+                    <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <select
+                      value={complaint.assigned_to || ''}
+                      onChange={(e) => onAssign && onAssign(complaint.id, e.target.value)}
+                      className="w-full px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
+                      aria-label={`Assign staff for complaint ${complaint.id}`}
+                    >
+                      <option value="">Assign Staff...</option>
+                      {SOCIETY_STAFF.map((staff) => (
+                        <option key={staff} value={staff}>
+                          {staff}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               {/* Status Change Dropdown */}

@@ -7,12 +7,16 @@ const express = require('express');
 const router = express.Router();
 const complaintController = require('../controllers/complaintController');
 const { validateCreateComplaint, validateUpdateComplaint } = require('../middleware/validator');
+const { authenticate, requireCommittee } = require('../middleware/auth');
+
+// Apply authentication middleware to all complaint endpoints
+router.use(authenticate);
 
 // Stats endpoint
 router.get('/stats/summary', complaintController.getStats);
 
-// Clusters endpoint
-router.get('/clusters', complaintController.getClusters);
+// Clusters endpoint (Committee only)
+router.get('/clusters', requireCommittee, complaintController.getClusters);
 
 // Complaints CRUD endpoints
 router.route('/')
@@ -21,7 +25,7 @@ router.route('/')
 
 router.route('/:id')
   .get(complaintController.getComplaintById)
-  .patch(validateUpdateComplaint, complaintController.updateComplaint)
-  .delete(complaintController.deleteComplaint);
+  .patch(requireCommittee, validateUpdateComplaint, complaintController.updateComplaint)
+  .delete(requireCommittee, complaintController.deleteComplaint);
 
 module.exports = router;

@@ -6,6 +6,7 @@ const express = require('express');
 const cors = require('cors');
 const config = require('./config');
 const complaintRoutes = require('./routes/complaintRoutes');
+const authRoutes = require('./routes/authRoutes');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -14,7 +15,7 @@ const app = express();
 app.use(cors({
   origin: '*', // Allow Vite client during development
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 }));
 
 app.use(express.json());
@@ -38,7 +39,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Mount Complaints API
+// Mount APIs
+app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
 
 // Error handling

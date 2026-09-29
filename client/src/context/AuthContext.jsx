@@ -2,20 +2,24 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-const DEFAULT_COMMITTEE_USER = {
+export const DEFAULT_COMMITTEE_USER = {
   id: 'u-comm-01',
   name: 'Sunil Mehta',
+  designation: 'Committee Member',
   email: 'secretary@greensociety.org',
-  role: 'committee',
-  flat: 'Secretary Office'
+  role: 'COMMITTEE',
+  flat: 'Secretary Office',
+  token: 'demo-token-committee-sunil'
 };
 
-const DEFAULT_RESIDENT_USER = {
+export const DEFAULT_RESIDENT_USER = {
   id: 'u-res-01',
-  name: 'Rajesh Sharma',
-  email: 'rajesh.b402@gmail.com',
-  role: 'resident',
-  flat: 'B-402'
+  name: 'Akash',
+  designation: 'Resident',
+  email: 'akash.b402@gmail.com',
+  role: 'RESIDENT',
+  flat: 'B-402',
+  token: 'demo-token-resident-akash'
 };
 
 export const AuthProvider = ({ children }) => {
@@ -23,7 +27,10 @@ export const AuthProvider = ({ children }) => {
     const saved = localStorage.getItem('society_triage_user');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Normalize role to uppercase
+        if (parsed.role) parsed.role = parsed.role.toUpperCase();
+        return parsed;
       } catch (e) {
         // fallback
       }
@@ -43,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     setUser(DEFAULT_COMMITTEE_USER);
   };
 
-  const loginAsResident = (flat = 'B-402', name = 'Rajesh Sharma') => {
+  const loginAsResident = (flat = 'B-402', name = 'Akash') => {
     setUser({
       ...DEFAULT_RESIDENT_USER,
       flat,
@@ -55,8 +62,19 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const isCommittee = user?.role?.toUpperCase() === 'COMMITTEE';
+  const isResident = user?.role?.toUpperCase() === 'RESIDENT';
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loginAsCommittee, loginAsResident, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      setUser, 
+      isCommittee, 
+      isResident, 
+      loginAsCommittee, 
+      loginAsResident, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

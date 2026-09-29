@@ -15,7 +15,8 @@ import {
   Download,
   Building,
   Sparkles,
-  UserCheck
+  UserCheck,
+  UserPlus
 } from 'lucide-react';
 import api from '../services/api';
 import DashboardStat from '../components/DashboardStat';
@@ -26,6 +27,7 @@ import CategoryBadge from '../components/CategoryBadge';
 import LoadingState from '../components/LoadingState';
 import EmptyState from '../components/EmptyState';
 import Sidebar from '../components/Sidebar';
+import AssignStaffModal from '../components/AssignStaffModal';
 import { SOCIETY_STAFF } from '../constants/staff';
 
 export const CommitteeDashboard = () => {
@@ -52,6 +54,7 @@ export const CommitteeDashboard = () => {
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [urgencyFilter, setUrgencyFilter] = useState('ALL');
   const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table'
+  const [assigningComplaint, setAssigningComplaint] = useState(null);
 
   const loadData = async () => {
     try {
@@ -117,8 +120,10 @@ export const CommitteeDashboard = () => {
       ]);
       setStats(newStats);
       setClusters(newClusters || []);
+      return updated;
     } catch (err) {
       alert(`Could not assign staff: ${err.message}`);
+      throw err;
     }
   };
 
@@ -576,6 +581,7 @@ export const CommitteeDashboard = () => {
                 isCommitteeView={true}
                 onStatusChange={handleStatusChange}
                 onAssign={handleAssign}
+                onOpenAssign={setAssigningComplaint}
               />
             ))}
           </div>
@@ -627,19 +633,29 @@ export const CommitteeDashboard = () => {
                         )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <select
-                          value={c.assigned_to || ''}
-                          onChange={(e) => handleAssign(c.id, e.target.value)}
-                          className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
-                          aria-label={`Assign staff for complaint ${c.id}`}
-                        >
-                          <option value="">Unassigned</option>
-                          {SOCIETY_STAFF.map((staff) => (
-                            <option key={staff} value={staff}>
-                              {staff}
-                            </option>
-                          ))}
-                        </select>
+                        {c.assigned_to ? (
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-slate-800">{c.assigned_to}</span>
+                            <button
+                              type="button"
+                              onClick={() => setAssigningComplaint(c)}
+                              className="text-[11px] text-blue-600 hover:text-blue-800 underline font-medium"
+                              title="Reassign staff"
+                            >
+                              (change)
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setAssigningComplaint(c)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition shadow-2xs"
+                            title="Assign staff to this complaint"
+                          >
+                            <UserPlus className="w-3.5 h-3.5" />
+                            <span>Assign Staff</span>
+                          </button>
+                        )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
@@ -679,9 +695,20 @@ export const CommitteeDashboard = () => {
                         )}
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
+                        {(!c.assigned_to || c.status === 'OPEN') && (
+                          <button
+                            type="button"
+                            onClick={() => setAssigningComplaint(c)}
+                            className="text-xs font-bold text-blue-600 hover:text-blue-800 mr-2.5 inline-flex items-center gap-1"
+                            title="Assign staff"
+                          >
+                            <UserPlus className="w-3 h-3" />
+                            <span>Assign</span>
+                          </button>
+                        )}
                         <Link
                           to={`/complaints/${c.id}`}
-                          className="text-xs font-semibold text-blue-600 hover:text-blue-800"
+                          className="text-xs font-semibold text-slate-600 hover:text-slate-900"
                         >
                           View
                         </Link>
@@ -693,6 +720,14 @@ export const CommitteeDashboard = () => {
             </div>
           </div>
         )}
+
+        {/* Committee Staff Assignment Modal */}
+        <AssignStaffModal
+          isOpen={!!assigningComplaint}
+          complaint={assigningComplaint}
+          onClose={() => setAssigningComplaint(null)}
+          onAssign={handleAssign}
+        />
       </main>
     </div>
   );

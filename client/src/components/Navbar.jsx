@@ -10,7 +10,8 @@ import {
   UserCircle2, 
   LogOut,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Layers
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -20,15 +21,12 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const isCommittee = user?.role === 'committee';
+  const isCommittee = user?.role?.toUpperCase() === 'COMMITTEE';
 
-  const navLinks = [
-    {
-      to: '/committee',
-      label: 'Committee Dashboard',
-      icon: LayoutDashboard,
-      badge: 'Admin'
-    },
+  // Role-Specific Navigation (Phase 5A)
+  // RESIDENT: Resident Portal | Submit Complaint | My Complaints
+  // COMMITTEE: Committee Dashboard | Complaints | Clusters
+  const residentNavLinks = [
     {
       to: '/resident',
       label: 'Resident Portal',
@@ -47,8 +45,30 @@ export const Navbar = () => {
     }
   ];
 
+  const committeeNavLinks = [
+    {
+      to: '/committee',
+      label: 'Committee Dashboard',
+      icon: LayoutDashboard,
+      badge: 'Admin'
+    },
+    {
+      to: '/committee#complaints',
+      label: 'Complaints',
+      icon: FileText
+    },
+    {
+      to: '/committee#clusters',
+      label: 'Clusters',
+      icon: Layers
+    }
+  ];
+
+  const navLinks = isCommittee ? committeeNavLinks : residentNavLinks;
+
   const isActive = (path) => {
-    if (path === '/committee' && (location.pathname === '/' || location.pathname === '/committee')) return true;
+    if (path === '/committee' && (location.pathname === '/' || location.pathname === '/committee') && isCommittee) return true;
+    if (path === '/resident' && (location.pathname === '/' || location.pathname === '/resident') && !isCommittee) return true;
     return location.pathname === path;
   };
 
@@ -117,64 +137,90 @@ export const Navbar = () => {
           {/* User Role Switcher & Profile */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition text-left"
-                  aria-expanded={userMenuOpen}
-                  aria-haspopup="true"
-                >
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                    isCommittee ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'
-                  }`}>
-                    {isCommittee ? <ShieldCheck className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
-                  </div>
-                  <div>
-                    <span className="block text-xs font-semibold text-slate-800 leading-none">
-                      {user.name}
-                    </span>
-                    <span className="block text-[10px] text-slate-500 leading-none mt-1">
-                      {isCommittee ? 'Committee Member' : `Flat ${user.flat}`}
-                    </span>
-                  </div>
-                </button>
+              <div className="flex items-center gap-2.5">
+                {/* Instant Role Switcher for Hackathon Demo */}
+                {isCommittee ? (
+                  <button
+                    type="button"
+                    onClick={() => loginAsResident('B-402', 'Akash')}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-semibold transition"
+                    title="Switch demo role to Resident"
+                  >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span>Switch to Resident</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => loginAsCommittee()}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-semibold transition"
+                    title="Switch demo role to Committee"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Switch to Committee</span>
+                  </button>
+                )}
 
-                {/* Dropdown Menu */}
-                {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 text-xs">
-                    <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                      <p className="font-semibold text-slate-800">{user.name}</p>
-                      <p className="text-slate-500 text-[11px]">{user.email}</p>
-                      <p className="text-slate-400 text-[10px] mt-0.5">Role: {user.role.toUpperCase()}</p>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition text-left"
+                    aria-expanded={userMenuOpen}
+                    aria-haspopup="true"
+                  >
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                      isCommittee ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'
+                    }`}>
+                      {isCommittee ? <ShieldCheck className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                     </div>
-
-                    <div className="px-2 py-1">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 px-2">
-                        Switch Demo Role
+                    <div>
+                      <span className="block text-xs font-semibold text-slate-800 leading-none">
+                        {user.name}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => { loginAsCommittee(); setUserMenuOpen(false); }}
-                        className={`w-full text-left px-2.5 py-1.5 rounded mt-1 flex items-center gap-2 ${
-                          isCommittee ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-700 hover:bg-slate-100'
-                        }`}
-                      >
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>Committee (Admin)</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => { loginAsResident(); setUserMenuOpen(false); }}
-                        className={`w-full text-left px-2.5 py-1.5 rounded mt-0.5 flex items-center gap-2 ${
-                          !isCommittee ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-slate-700 hover:bg-slate-100'
-                        }`}
-                      >
-                        <UserCheck className="w-3.5 h-3.5" />
-                        <span>Resident (B-402)</span>
-                      </button>
+                      <span className="block text-[10px] text-slate-500 leading-none mt-1 font-medium">
+                        {isCommittee ? 'Committee Member' : `${user.name} — ${user.flat}`}
+                      </span>
                     </div>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {userMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 text-xs">
+                      <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                        <p className="font-semibold text-slate-800">{user.name}</p>
+                        <p className="text-slate-500 text-[11px]">{user.email}</p>
+                        <p className="text-slate-400 text-[10px] mt-0.5 font-bold uppercase tracking-wider">
+                          Role: {user.role.toUpperCase()}
+                        </p>
+                      </div>
+
+                      <div className="px-2 py-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 px-2">
+                          Switch Demo Role
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => { loginAsCommittee(); setUserMenuOpen(false); }}
+                          className={`w-full text-left px-2.5 py-1.5 rounded mt-1 flex items-center gap-2 ${
+                            isCommittee ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>Sunil Mehta — Committee</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => { loginAsResident('B-402', 'Akash'); setUserMenuOpen(false); }}
+                          className={`w-full text-left px-2.5 py-1.5 rounded mt-0.5 flex items-center gap-2 ${
+                            !isCommittee ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          <UserCheck className="w-3.5 h-3.5" />
+                          <span>Akash — B-402</span>
+                        </button>
+                      </div>
 
                     <div className="border-t border-slate-100 mt-2 pt-1 px-2">
                       <Link
@@ -197,7 +243,8 @@ export const Navbar = () => {
                   </div>
                 )}
               </div>
-            ) : (
+            </div>
+          ) : (
               <Link
                 to="/login"
                 className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-300 rounded-lg hover:bg-slate-50 transition"

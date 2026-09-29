@@ -15,18 +15,23 @@ import {
   Languages, 
   ShieldCheck,
   Building,
-  Save
+  Save,
+  UserPlus
 } from 'lucide-react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 import UrgencyBadge from '../components/UrgencyBadge';
 import CategoryBadge from '../components/CategoryBadge';
 import LoadingState from '../components/LoadingState';
+import AssignStaffModal from '../components/AssignStaffModal';
 import { SOCIETY_STAFF } from '../constants/staff';
 
 export const ComplaintDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, isCommittee: authIsCommittee } = useAuth();
+  const isCommittee = (user?.role?.toUpperCase() === 'COMMITTEE') || Boolean(authIsCommittee);
 
   const [complaint, setComplaint] = useState(null);
   const [clusteredComplaints, setClusteredComplaints] = useState([]);
@@ -37,7 +42,27 @@ export const ComplaintDetails = () => {
   // Form edit states for committee resolution
   const [status, setStatus] = useState('OPEN');
   const [assignedTo, setAssignedTo] = useState('');
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [successNotice, setSuccessNotice] = useState(null);
+
+  // Handler for direct staff assignment from modal
+  const handleAssignStaff = async (complaintId, staffName) => {
+    try {
+      const updated = await api.updateComplaint(complaintId, {
+        assigned_to: staffName,
+        status: 'ASSIGNED'
+      });
+      setComplaint(updated);
+      setStatus(updated.status);
+      setAssignedTo(updated.assigned_to || '');
+      setSuccessNotice(`Staff assigned successfully: ${staffName}`);
+      setTimeout(() => setSuccessNotice(null), 4000);
+      return updated;
+    } catch (err) {
+      alert(`Assignment failed: ${err.message}`);
+      throw err;
+    }
+  };
 
   const fetchComplaint = async () => {
     try {
@@ -133,15 +158,17 @@ export const ComplaintDetails = () => {
           <span>Back to Complaints</span>
         </button>
 
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition"
-          title="Delete Complaint"
-        >
-          <Trash2 className="w-4 h-4" />
-          <span>Delete Ticket</span>
-        </button>
+        {isCommittee && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition"
+            title="Delete Complaint"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Delete Ticket</span>
+          </button>
+        )}
       </div>
 
       {successNotice && (
@@ -285,76 +312,150 @@ export const ComplaintDetails = () => {
           )}
         </div>
 
-        {/* Right Column: Committee Action Workflow */}
+        {/* Right Column */}
         <div className="space-y-6">
+          {/* Complaint Status & Progress Panel */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <ShieldCheck className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-sm font-bold text-slate-900">Committee Resolution Workflow</h3>
+              <Clock className="w-5 h-5 text-emerald-600" />
+              <h3 className="text-sm font-bold text-slate-900">Complaint Status & Progress</h3>
             </div>
 
-            <form onSubmit={handleUpdate} className="space-y-4 text-xs">
+            <div className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1" htmlFor="statusSelect">
-                  Ticket Status
-                </label>
-                <select
-                  id="statusSelect"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 font-medium focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="OPEN">OPEN (Unassigned)</option>
-                  <option value="ASSIGNED">ASSIGNED (Staff dispatched)</option>
-                  <option value="IN_PROGRESS">IN_PROGRESS (Under repair)</option>
-                  <option value="RESOLVED">RESOLVED (Closed)</option>
-                </select>
+                <span className="text-slate-500 font-medium block mb-1">Current Ticket Status</span>
+                <StatusBadge status={complaint.status} size="md" />
               </div>
 
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1" htmlFor="assignedInput">
-                  Assigned Personnel / Agency
-                </label>
-                <input
-                  id="assignedInput"
-                  type="text"
-                  value={assignedTo}
-                  onChange={(e) => setAssignedTo(e.target.value)}
-                  placeholder="e.g. Ramesh (Plumber), Johnson Lifts"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {/* Quick staff picker helpers */}
-              <div className="space-y-1.5 pt-1">
-                <span className="text-[11px] font-medium text-slate-400 block">Quick Assign Staff:</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {SOCIETY_STAFF.map((staff) => (
+              {complaint.assigned_to ? (
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <span className="text-slate-500 font-medium block text-[11px]">Assigned Personnel</span>
+                    <p className="font-bold text-slate-800 text-xs mt-0.5 flex items-center gap-1.5">
+                      <Wrench className="w-3.5 h-3.5 text-blue-600" />
+                      <span>{complaint.assigned_to}</span>
+                    </p>
+                  </div>
+                  {isCommittee && (
                     <button
-                      key={staff}
                       type="button"
-                      onClick={() => {
-                        setAssignedTo(staff);
-                        if (status === 'OPEN') setStatus('ASSIGNED');
-                      }}
-                      className="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px] font-medium"
+                      onClick={() => setIsAssignModalOpen(true)}
+                      className="text-[11px] text-blue-600 hover:text-blue-800 underline font-semibold ml-2"
+                      title="Reassign staff"
                     >
-                      {staff}
+                      (change)
                     </button>
-                  ))}
+                  )}
                 </div>
+              ) : (
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <span className="text-slate-500 font-medium block text-[11px]">Assigned Personnel</span>
+                    <p className="font-medium text-slate-600 text-xs mt-0.5">Pending committee assignment</p>
+                  </div>
+                  {isCommittee && (complaint.status?.toUpperCase() === 'OPEN' || !complaint.assigned_to) && (
+                    <button
+                      type="button"
+                      onClick={() => setIsAssignModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition"
+                      title="Assign staff to open complaint"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>Assign Complaint</span>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {complaint.status === 'RESOLVED' ? (
+                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800">
+                  <span className="font-bold flex items-center gap-1.5 text-xs">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    ✅ Complaint Resolved
+                  </span>
+                  <p className="text-[11px] text-emerald-700 mt-1">
+                    This issue has been addressed and closed by society management.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-slate-600 text-[11px] leading-relaxed">
+                  Your complaint is under active tracking by the Managing Committee. You will see live status updates here.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Committee Action Workflow (Only visible to Committee members) */}
+          {isCommittee && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                <h3 className="text-sm font-bold text-slate-900">Committee Resolution Workflow</h3>
               </div>
 
-              <button
-                type="submit"
-                disabled={saving}
-                className="w-full mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm disabled:opacity-50"
-              >
-                <Save className="w-4 h-4" />
-                <span>{saving ? 'Updating...' : 'Save Resolution Updates'}</span>
-              </button>
-            </form>
-          </div>
+              <form onSubmit={handleUpdate} className="space-y-4 text-xs">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1" htmlFor="statusSelect">
+                    Ticket Status
+                  </label>
+                  <select
+                    id="statusSelect"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 font-medium focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="OPEN">OPEN (Unassigned)</option>
+                    <option value="ASSIGNED">ASSIGNED (Staff dispatched)</option>
+                    <option value="IN_PROGRESS">IN_PROGRESS (Under repair)</option>
+                    <option value="RESOLVED">RESOLVED (Closed)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1" htmlFor="assignedInput">
+                    Assigned Personnel / Agency
+                  </label>
+                  <input
+                    id="assignedInput"
+                    type="text"
+                    value={assignedTo}
+                    onChange={(e) => setAssignedTo(e.target.value)}
+                    placeholder="e.g. Ramesh (Plumber), Johnson Lifts"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Quick staff picker helpers */}
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[11px] font-medium text-slate-400 block">Quick Assign Staff:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {SOCIETY_STAFF.map((staff) => (
+                      <button
+                        key={staff}
+                        type="button"
+                        onClick={() => {
+                          setAssignedTo(staff);
+                          if (status === 'OPEN') setStatus('ASSIGNED');
+                        }}
+                        className="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px] font-medium"
+                      >
+                        {staff}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="w-full mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{saving ? 'Updating...' : 'Save Resolution Updates'}</span>
+                </button>
+              </form>
+            </div>
+          )}
 
           {/* Society Contact Quick Card */}
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 text-xs space-y-2 text-slate-600">
@@ -367,6 +468,14 @@ export const ComplaintDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Committee Staff Assignment Modal */}
+      <AssignStaffModal
+        isOpen={isAssignModalOpen}
+        complaint={complaint}
+        onClose={() => setIsAssignModalOpen(false)}
+        onAssign={handleAssignStaff}
+      />
     </div>
   );
 };

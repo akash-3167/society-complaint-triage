@@ -20,7 +20,7 @@ export const SubmitComplaint = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [residentName, setResidentName] = useState(user?.name || 'Rajesh Sharma');
+  const [residentName, setResidentName] = useState(user?.name || 'Akash');
   const [flatNumber, setFlatNumber] = useState(user?.flat || 'B-402');
   const [description, setDescription] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);

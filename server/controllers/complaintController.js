@@ -11,7 +11,14 @@ const clusteringService = require('../services/clustering');
 // @route   GET /api/complaints
 const getComplaints = async (req, res, next) => {
   try {
-    const { status, category, urgency, flat_number, search, cluster_id } = req.query;
+    const { status, category, urgency, search, cluster_id } = req.query;
+    let flat_number = req.query.flat_number;
+
+    // Role-based access control: Residents only access their own complaints
+    if (req.user && req.user.role === 'RESIDENT') {
+      flat_number = req.user.flat || 'B-402';
+    }
+
     const complaints = await ComplaintModel.getAll({
       status,
       category,
@@ -45,6 +52,20 @@ const getComplaintById = async (req, res, next) => {
           message: `Complaint not found with ID: ${id}`
         }
       });
+    }
+
+    // Role-based access control: Residents only access complaints from their own flat
+    if (req.user && req.user.role === 'RESIDENT') {
+      const userFlat = (req.user.flat || '').toUpperCase();
+      const complaintFlat = (complaint.flat_number || '').toUpperCase();
+      if (userFlat && complaintFlat && userFlat !== complaintFlat) {
+        return res.status(403).json({
+          success: false,
+          error: {
+            message: 'Forbidden: Residents can only access complaints from their own flat'
+          }
+        });
+      }
     }
 
     res.status(200).json({

@@ -25,25 +25,25 @@ export const Sidebar = ({
   ];
 
   return (
-    <aside className="w-60 bg-white border-r border-slate-200/80 hidden lg:flex flex-col justify-between shrink-0 min-h-[calc(100vh-3.75rem)] p-4">
+    <aside className="w-64 glass-panel border-r border-slate-200/80 hidden lg:flex flex-col justify-between shrink-0 min-h-[calc(100vh-4rem)] p-4.5">
       <div className="space-y-5">
         {/* Society Overview Card */}
-        <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/70">
+        <div className="p-3.5 bg-white/80 rounded-2xl border border-slate-200/80 shadow-2xs">
           <div className="flex items-center gap-2 text-slate-900 font-bold text-xs tracking-tight">
-            <Building className="w-3.5 h-3.5 text-blue-600" />
+            <Building className="w-4 h-4 text-blue-600" />
             <span>Green Meadows CHS</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            4 Towers • 104 Residential Flats
+          <p className="text-[11px] text-slate-400 mt-1">
+            4 Residential Towers • 104 Units
           </p>
         </div>
 
         {/* Quick Filter Navigation */}
         <div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 block mb-1">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 block mb-1.5">
             Quick Views
           </span>
-          <nav className="space-y-0.5" aria-label="Sidebar filters">
+          <nav className="space-y-1" aria-label="Sidebar filters">
             {filterItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeFilter === item.id;
@@ -53,18 +53,18 @@ export const Sidebar = ({
                   key={item.id}
                   type="button"
                   onClick={() => onFilterChange(item.id)}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors text-left ${
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl transition-all text-left ${
                     isActive
-                      ? 'bg-slate-100 text-slate-900 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/70'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
-                  <div className="flex items-center gap-2 truncate">
+                  <div className="flex items-center gap-2.5 truncate">
                     <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
                     <span className="truncate">{item.label}</span>
                   </div>
                   <span
-                    className={`ml-2 px-1.5 py-0.2 rounded text-[10px] font-semibold ${
+                    className={`ml-2 px-1.5 py-0.2 rounded-full text-[10px] font-semibold ${
                       item.badgeColor || (isActive ? 'bg-slate-200 text-slate-800' : 'bg-slate-100 text-slate-500')
                     }`}
                   >
@@ -78,13 +78,13 @@ export const Sidebar = ({
       </div>
 
       {/* AI Readiness Banner in Footer */}
-      <div className="pt-3 border-t border-slate-100 space-y-2">
-        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/70 text-xs text-slate-600">
-          <div className="flex items-center gap-1.5 font-semibold text-slate-800 mb-1">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+      <div className="pt-3 border-t border-slate-100/90 space-y-2">
+        <div className="p-3.5 glass-ai-badge rounded-2xl text-xs text-slate-700">
+          <div className="flex items-center gap-1.5 font-bold text-indigo-950 mb-1">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
             <span>AI Triage Engine</span>
           </div>
-          <p className="text-[11px] text-slate-400 leading-normal">
+          <p className="text-[11px] text-slate-500 leading-normal">
             Automated categorization, urgency scoring, language detection & cluster grouping.
           </p>
         </div>

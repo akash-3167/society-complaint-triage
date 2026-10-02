@@ -59,13 +59,13 @@ export const AssignStaffModal = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md transition-opacity animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-labelledby="assign-modal-title"
     >
       <div 
-        className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full overflow-hidden flex flex-col max-h-[90vh]"
+        className="glass-panel rounded-3xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

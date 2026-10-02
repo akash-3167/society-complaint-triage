@@ -6,8 +6,8 @@ export const LoadingState = ({ message = 'Loading complaints...', type = 'spinne
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full animate-pulse" aria-busy="true" aria-label="Loading content">
         {[1, 2, 3, 4, 5, 6].map((n) => (
-          <div key={n} className="bg-white rounded-xl border border-slate-200/80 p-4 space-y-3">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+          <div key={n} className="glass-panel rounded-2xl p-4 space-y-3">
+            <div className="flex justify-between items-center pb-2 border-b border-slate-100/60">
               <div className="h-3.5 bg-slate-200 rounded w-1/3"></div>
               <div className="h-4 bg-slate-100 rounded-full w-16"></div>
             </div>

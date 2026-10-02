@@ -17,7 +17,12 @@
     padding: 0;
     min-height: 100vh;
     background-color: #f8fafc;
-    color: #1e293b;
+    color: #0f172a;
+    background-image: 
+      radial-gradient(at 10% 10%, rgba(224, 231, 255, 0.45) 0px, transparent 55%),
+      radial-gradient(at 90% 15%, rgba(219, 234, 254, 0.4) 0px, transparent 50%),
+      radial-gradient(at 50% 90%, rgba(241, 245, 249, 0.6) 0px, transparent 60%);
+    background-attachment: fixed;
   }
 
   /* Accessible focus indicators */
@@ -43,9 +48,33 @@
   background: #94a3b8;
 }
 
-/* Glassmorphism and card elevation */
-.card-glass {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+/* Controlled Glassmorphism System for PropertyOS */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 1px 3px 0 rgba(15, 23, 42, 0.02);
+}
+
+.glass-panel-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-hover:hover {
+  border-color: rgba(203, 213, 225, 0.95);
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  transform: translateY(-1px);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+}
+
+.glass-ai-badge {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.85) 0%, rgba(245, 243, 255, 0.8) 100%);
+  border: 1px solid rgba(219, 234, 254, 0.85);
 }
 

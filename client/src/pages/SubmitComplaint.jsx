@@ -98,28 +98,28 @@ export const SubmitComplaint = () => {
       </button>
 
       {/* Main Form Container */}
-      <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-5">
+      <div className="glass-panel rounded-2xl p-6 sm:p-8 space-y-6">
         {/* Header */}
-        <div className="border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/70">
+        <div className="border-b border-slate-100/90 pb-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/70">
               Resident Service Desk
             </span>
             <span className="text-xs text-slate-400">Green Meadows CHS</span>
           </div>
-          <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-            Log a Maintenance Complaint
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Report an issue
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Describe the issue clearly. English, Hindi, or Hinglish are all supported.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Tell us what's happening in your society. Our AI will automatically analyze and route your complaint.
           </p>
         </div>
 
         {/* AI Triage Banner: Subtle and elegant */}
-        <div className="py-2.5 px-3.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2.5 text-xs text-slate-600">
-          <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+        <div className="p-3.5 rounded-xl glass-ai-badge flex items-start gap-2.5 text-xs text-slate-700">
+          <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
           <div className="leading-relaxed">
-            <span className="font-semibold text-slate-800">Automated AI Triage:</span> No need to select category or urgency manually. Our triage engine detects the issue domain, priority, and links duplicates automatically.
+            <span className="font-semibold text-indigo-950">Automated AI Triage:</span> No need to select category or urgency manually. Our triage engine detects the issue domain, priority, and links duplicates automatically.
           </div>
         </div>
 

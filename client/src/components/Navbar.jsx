@@ -72,21 +72,26 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 transition-colors">
+    <header className="glass-nav sticky top-0 z-40 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-15">
-          {/* Logo & Brand */}
+        <div className="flex items-center justify-between h-16">
+          {/* Logo & Brand: SocietyOS */}
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8.5 h-8.5 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-xs group-hover:bg-blue-700 transition">
-                <Building2 className="w-4.5 h-4.5" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-xs group-hover:shadow-md transition">
+                <Building2 className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm sm:text-base text-slate-900 tracking-tight leading-tight">
-                  Society Triage
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-base text-slate-900 tracking-tight leading-tight">
+                    SocietyOS
+                  </span>
+                  <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 hidden sm:inline">
+                    PRO
+                  </span>
+                </div>
                 <span className="text-[10px] text-slate-400 font-medium leading-none mt-0.5">
-                  Green Meadows CHS
+                  AI-powered community operations
                 </span>
               </div>
             </Link>
@@ -103,7 +108,7 @@ export const Navbar = () => {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-2xs ml-1 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-2xs ml-1 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     <Icon className="w-3.5 h-3.5" />
                     <span>{link.label}</span>
@@ -117,8 +122,8 @@ export const Navbar = () => {
                   to={link.to}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                     active
-                      ? 'bg-slate-100 text-slate-900 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/70'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
                   <Icon className={`w-3.5 h-3.5 ${active ? 'text-blue-600' : 'text-slate-400'}`} />

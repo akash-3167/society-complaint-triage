@@ -198,17 +198,17 @@ export const CommitteeDashboard = () => {
         {/* Top Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/70">
-                Managing Committee
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50/80 text-indigo-700 border border-indigo-200/70">
+                Operations Command
               </span>
-              <span className="text-xs text-slate-400">Green Meadows CHS • 104 Flats</span>
+              <span className="text-xs text-slate-400">Green Meadows CHS • 104 Units</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Complaint Triage Dashboard
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              Good morning, Sunil
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Review incoming issues, evaluate automated AI triage, link clusters, and assign staff.
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Here's what's happening in your society today &bull; Automated triage & incident clustering active.
             </p>
           </div>
 
@@ -282,7 +282,7 @@ export const CommitteeDashboard = () => {
 
         {/* COMPLAINT CLUSTERS (Phase 3 Rule-Based Grouping) */}
         {clusters.length > 0 && (
-          <div id="clusters" className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs space-y-3.5">
+          <div id="clusters" className="glass-panel rounded-2xl p-5 sm:p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="p-1 rounded-md bg-indigo-50 text-indigo-600">
@@ -437,7 +437,7 @@ export const CommitteeDashboard = () => {
         )}
 
         {/* Filters and Search Control Toolbar */}
-        <div id="complaints" className="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs space-y-3">
+        <div id="complaints" className="glass-panel rounded-2xl p-4 sm:p-5 space-y-3.5">
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative flex-1">

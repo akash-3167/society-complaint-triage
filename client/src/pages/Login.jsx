@@ -21,24 +21,29 @@ export const Login = () => {
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-lg space-y-6">
         {/* Main Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-9 space-y-6">
+        <div className="glass-panel rounded-3xl p-7 sm:p-10 space-y-6">
           {/* Brand Header */}
           <div className="text-center space-y-2">
-            <div className="inline-flex w-12 h-12 rounded-xl bg-blue-600 text-white items-center justify-center shadow-xs">
-              <Building2 className="w-6 h-6" />
+            <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white items-center justify-center shadow-sm">
+              <Building2 className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Society Complaint Triage
-              </h1>
+              <div className="flex items-center justify-center gap-1.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                  SocietyOS
+                </h1>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60">
+                  PRO
+                </span>
+              </div>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Green Meadows Co-operative Housing Society
+                AI-powered community operations &bull; Green Meadows CHS
               </p>
             </div>
             <div className="pt-1">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/60">
-                <Sparkles className="w-3 h-3 text-blue-500" />
-                <span>AI-Powered Maintenance Triage</span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold glass-ai-badge text-indigo-900">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Multilingual Complaint Triage</span>
               </span>
             </div>
           </div>

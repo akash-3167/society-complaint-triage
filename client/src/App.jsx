@@ -87,15 +87,17 @@ function AppContent() {
       </main>
 
       {/* Clean Modern SaaS Footer */}
-      <footer className="bg-white border-t border-slate-200/80 py-5 px-6">
+      <footer className="glass-nav border-t border-slate-200/70 py-5 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-700">Society Complaint Triage</span>
+            <span className="font-bold text-slate-800">SocietyOS</span>
             <span className="text-slate-300">&bull;</span>
-            <span>Green Meadows Co-operative Housing Society</span>
+            <span>AI-powered community operations</span>
+            <span className="text-slate-300 hidden sm:inline">&bull;</span>
+            <span className="text-slate-400 hidden sm:inline">Green Meadows CHS</span>
           </div>
           <div className="flex items-center gap-3 text-slate-400">
-            <span>AI Triage Powered by Gemini</span>
+            <span>Gemini AI Triage</span>
             <span className="text-slate-300">&bull;</span>
             <span>Production RBAC</span>
           </div>

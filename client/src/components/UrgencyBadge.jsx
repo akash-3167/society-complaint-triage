@@ -1,37 +1,31 @@
 import React from 'react';
-import { AlertCircle, AlertTriangle, Clock } from 'lucide-react';
 
 const URGENCY_CONFIG = {
   CRITICAL: {
     label: 'Critical',
-    icon: AlertCircle,
-    classes: 'bg-rose-50 text-rose-700 border-rose-200/80 font-semibold',
-    iconClass: 'text-rose-600'
+    dot: 'bg-rose-500 animate-pulse',
+    classes: 'bg-rose-50/80 text-rose-700 border-rose-200/80 font-semibold'
   },
   HIGH: {
     label: 'High',
-    icon: AlertTriangle,
-    classes: 'bg-amber-50 text-amber-800 border-amber-200/80 font-medium',
-    iconClass: 'text-amber-600'
+    dot: 'bg-amber-500',
+    classes: 'bg-amber-50/80 text-amber-800 border-amber-200/80 font-medium'
   },
   MEDIUM: {
     label: 'Medium',
-    icon: null,
-    classes: 'bg-slate-100 text-slate-700 border-slate-200/80 font-medium',
-    iconClass: 'text-slate-500'
+    dot: 'bg-slate-400',
+    classes: 'bg-slate-100/80 text-slate-700 border-slate-200/70 font-medium'
   },
   LOW: {
     label: 'Low',
-    icon: null,
-    classes: 'bg-slate-50 text-slate-500 border-slate-200/60 font-normal',
-    iconClass: 'text-slate-400'
+    dot: 'bg-slate-300',
+    classes: 'bg-slate-50/80 text-slate-500 border-slate-200/50 font-normal'
   }
 };
 
-export const UrgencyBadge = ({ urgency = 'MEDIUM', size = 'md', showIcon = true }) => {
+export const UrgencyBadge = ({ urgency = 'MEDIUM', size = 'md' }) => {
   const normalized = (urgency || 'MEDIUM').toUpperCase();
   const config = URGENCY_CONFIG[normalized] || URGENCY_CONFIG.MEDIUM;
-  const Icon = config.icon;
 
   const sizeClasses = size === 'sm' 
     ? 'px-2 py-0.5 text-[11px]' 
@@ -39,10 +33,10 @@ export const UrgencyBadge = ({ urgency = 'MEDIUM', size = 'md', showIcon = true 
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border ${config.classes} ${sizeClasses} tracking-tight`}
+      className={`inline-flex items-center gap-1.5 rounded-full border ${config.classes} ${sizeClasses} tracking-tight select-none`}
       title={`Urgency: ${config.label}`}
     >
-      {showIcon && Icon && <Icon className={`w-3 h-3 ${config.iconClass}`} aria-hidden="true" />}
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} aria-hidden="true" />
       <span>{config.label}</span>
     </span>
   );

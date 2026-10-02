@@ -9,8 +9,8 @@ export const EmptyState = ({
   onAction
 }) => {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-8 sm:p-12 text-center max-w-md mx-auto my-6 shadow-2xs">
-      <div className="mx-auto w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+    <div className="glass-panel rounded-2xl p-8 sm:p-12 text-center max-w-md mx-auto my-6 shadow-2xs">
+      <div className="mx-auto w-10 h-10 rounded-full bg-slate-100/80 flex items-center justify-center text-slate-400 mb-3 border border-slate-200/50">
         <Icon className="w-5 h-5" aria-hidden="true" />
       </div>
       <h3 className="text-sm font-bold text-slate-800 tracking-tight">{title}</h3>

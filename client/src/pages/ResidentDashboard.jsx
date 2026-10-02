@@ -56,14 +56,14 @@ export const ResidentDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-7">
       {/* Welcome & Top Action Banner */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+      <div className="glass-panel rounded-2xl p-6 sm:p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               Resident Portal
             </span>
-            <span className="text-xs text-slate-400 font-medium">Green Meadows CHS</span>
+            <span className="text-xs text-slate-400 font-medium">SocietyOS &bull; Green Meadows CHS</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Welcome, {user?.name || 'Resident'}
@@ -82,7 +82,7 @@ export const ResidentDashboard = () => {
           <button
             type="button"
             onClick={fetchResidentComplaints}
-            className="p-2.5 rounded-xl border border-slate-200/80 hover:bg-slate-50 text-slate-600 transition shadow-2xs hover:border-slate-300"
+            className="p-2.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white text-slate-600 transition shadow-2xs hover:border-slate-300"
             title="Refresh Complaints"
             aria-label="Refresh Complaints"
           >
@@ -91,7 +91,7 @@ export const ResidentDashboard = () => {
           
           <Link
             to="/submit"
-            className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shadow-xs hover:shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shadow-2xs hover:shadow-xs focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Submit Complaint</span>
@@ -100,12 +100,12 @@ export const ResidentDashboard = () => {
       </div>
 
       {/* AI Assistance Tip Box */}
-      <div className="bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/50 border border-blue-100/80 rounded-xl p-4 sm:p-4.5 flex items-start gap-3 shadow-2xs">
-        <div className="p-1.5 rounded-lg bg-blue-100/70 text-blue-600 shrink-0 mt-0.5">
+      <div className="glass-ai-badge rounded-2xl p-4 sm:p-4.5 flex items-start gap-3">
+        <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100 shrink-0 mt-0.5">
           <Sparkles className="w-4 h-4" />
         </div>
         <div className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-          <strong className="text-blue-900 font-semibold">Write in Hindi, English, or Hinglish: </strong>
+          <strong className="text-indigo-950 font-semibold">Write in Hindi, English, or Hinglish: </strong>
           No need to format complaints or choose technical categories. The AI triage engine automatically assesses urgency, detects affected services, generates structured summaries, and links issues to ongoing society clusters.
         </div>
       </div>

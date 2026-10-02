@@ -11,28 +11,28 @@ export const DashboardStat = ({
 }) => {
   const colorStyles = {
     blue: {
-      iconBg: 'bg-blue-50 text-blue-600',
-      activeBorder: 'border-blue-500 ring-2 ring-blue-500/10'
+      iconBg: 'bg-blue-50/80 text-blue-600 border border-blue-100',
+      activeBorder: 'border-blue-500 ring-2 ring-blue-500/15'
     },
     red: {
-      iconBg: 'bg-rose-50 text-rose-600',
-      activeBorder: 'border-rose-500 ring-2 ring-rose-500/10'
+      iconBg: 'bg-rose-50/80 text-rose-600 border border-rose-100',
+      activeBorder: 'border-rose-500 ring-2 ring-rose-500/15'
     },
     amber: {
-      iconBg: 'bg-amber-50 text-amber-600',
-      activeBorder: 'border-amber-500 ring-2 ring-amber-500/10'
+      iconBg: 'bg-amber-50/80 text-amber-600 border border-amber-100',
+      activeBorder: 'border-amber-500 ring-2 ring-amber-500/15'
     },
     emerald: {
-      iconBg: 'bg-emerald-50 text-emerald-600',
-      activeBorder: 'border-emerald-500 ring-2 ring-emerald-500/10'
+      iconBg: 'bg-emerald-50/80 text-emerald-600 border border-emerald-100',
+      activeBorder: 'border-emerald-500 ring-2 ring-emerald-500/15'
     },
     indigo: {
-      iconBg: 'bg-indigo-50 text-indigo-600',
-      activeBorder: 'border-indigo-500 ring-2 ring-indigo-500/10'
+      iconBg: 'bg-indigo-50/80 text-indigo-600 border border-indigo-100',
+      activeBorder: 'border-indigo-500 ring-2 ring-indigo-500/15'
     },
     slate: {
-      iconBg: 'bg-slate-100 text-slate-600',
-      activeBorder: 'border-slate-700 ring-2 ring-slate-700/10'
+      iconBg: 'bg-slate-100/80 text-slate-600 border border-slate-200/60',
+      activeBorder: 'border-slate-700 ring-2 ring-slate-700/15'
     }
   };
 
@@ -45,18 +45,18 @@ export const DashboardStat = ({
       role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
       onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
-      className={`bg-white rounded-xl border p-4 sm:p-4.5 transition-all duration-150 flex flex-col justify-between ${
+      className={`glass-panel glass-panel-hover rounded-2xl p-4.5 sm:p-5 flex flex-col justify-between ${
         active 
-          ? `${style.activeBorder} shadow-xs` 
-          : 'border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-xs'
+          ? `${style.activeBorder}` 
+          : ''
       } ${isClickable ? 'cursor-pointer select-none' : ''}`}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="text-xs font-semibold text-slate-500 tracking-tight">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
           {title}
         </span>
         {Icon && (
-          <div className={`p-1.5 rounded-lg shrink-0 ${style.iconBg}`}>
+          <div className={`p-2 rounded-xl shrink-0 ${style.iconBg}`}>
             <Icon className="w-4 h-4" aria-hidden="true" />
           </div>
         )}

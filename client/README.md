@@ -1,16 +1,71 @@
-# React + Vite
+# Society Complaint Triage — Frontend Client 🏢⚡
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Modern React 19 + Vite frontend for residential housing society complaint management and triage.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Vercel Deployment Guide
 
-## React Compiler
+This directory is ready for deployment on **Vercel**.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Configuration
+* **Framework Preset**: `Vite`
+* **Root Directory**: `client`
+* **Build Command**: `npm run build`
+* **Output Directory**: `dist`
+* **Install Command**: `npm install`
 
-## Expanding the Oxlint configuration
+### Environment Variables
+Configure under **Project Settings ➔ Environment Variables** in Vercel:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+| Variable | Recommended Value | Description |
+|---|---|---|
+| `VITE_API_URL` | `https://your-backend.domain/api` | Base URL of the backend API (defaults to `http://localhost:5000/api`) |
+
+### Single-Page Application (SPA) Routing
+A `vercel.json` file is included in this directory to handle client-side routing rewrites so that page reloads on deep links (`/committee`, `/resident`, `/complaints/:id`) never trigger 404 errors:
+```json
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+---
+
+## 🏃 Local Development
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Configure Environment
+Create `.env` inside `client/`:
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173).
+
+### 4. Build for Production
+```bash
+npm run build
+```
+
+---
+
+## 🌟 Key Features
+
+* **Committee Dashboard**: Live metrics, urgency filtering, AI cluster detection, and staff assignment.
+* **Resident Portal**: Seamless ticket logging in English, Hindi, or Hinglish with live status tracking.
+* **Staff Assignment**: Integrated assignment modal with predefined society staff list.
+* **Demo Role Switcher**: Quick toggle between Committee and Resident roles in the navigation bar.

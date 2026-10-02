@@ -1,179 +1,247 @@
 # Society Complaint Triage 🏢⚡
 
-A modern full-stack web application designed for residential housing societies (~100 flats) to streamline messy resident complaints sent via chats and messages in English, Hindi, or Hinglish.
-
-This repository contains the completed **Phase 1: Foundation**, providing a clean, modular structure, database-ready models, reusable UI components, and isolated service interfaces for Phase 2 AI triage and semantic clustering.
-
----
-
-## 🏗️ Tech Stack
-
-* **Frontend**: React 19 + Vite
-* **Styling**: Tailwind CSS v3
-* **Icons**: Lucide React
-* **Backend**: Node.js + Express
-* **Database**: Supabase PostgreSQL (with automatic in-memory fallback + realistic seed data for development)
-* **Configuration**: Environment variables via `dotenv`
+> **Intelligent, AI-Powered Housing Society Complaint Management System**  
+> Converts noisy resident complaints in English, Hindi, and Hinglish into structured, prioritized, and clustered tickets for managing committee volunteers.
 
 ---
 
-## 📂 Project Structure
+## 🚀 Deployed on Vercel
+
+The application is deployed on **Vercel** with client-side SPA routing and full role-based access control.
+
+* **Frontend Framework**: Vite + React 19
+* **Live Routes**:
+  * `/` & `/committee` — Committee Triage Dashboard (Clusters, Urgency, Staff Assignment)
+  * `/resident` — Resident Portal (Submit & Track)
+  * `/submit` — AI-Powered Complaint Submission (English/Hindi/Hinglish)
+  * `/my-complaints` — Resident Complaint History
+  * `/complaints/:id` — Complaint Details, Resolution, & Staff Assignment
+
+---
+
+## 🌟 Implemented Phases
+
+### ✅ Phase 1: Foundation & Architecture
+* **React 19 + Vite** frontend with Tailwind CSS v3 and Lucide React icons.
+* **Node.js + Express** REST backend with modular controllers, routes, and middleware.
+* **Dual Database Architecture**: Supabase PostgreSQL database integration with automatic, zero-config in-memory fallback and realistic pre-seeded society tickets.
+* Reusable design system: `StatusBadge`, `UrgencyBadge`, `CategoryBadge`, `DashboardStat`, `EmptyState`, and `LoadingState`.
+
+### ✅ Phase 2: Gemini 3.8 Flash AI Complaint Triage
+* Integrated **Google Gemini 3.8 Flash** via `@google/genai`.
+* Automatic multilingual triage parsing messy complaints in **English, Hindi, and Hinglish** (e.g. *"Main pump motor trip ho gaya hai, paani nahi aa raha"*).
+* Automatically extracts and infers:
+  * **Category**: `WATER`, `LIFT`, `PARKING`, `NOISE`, `CLEANING`, `MAINTENANCE`, `OTHER`
+  * **Urgency**: `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`
+  * **Detected Language**: e.g., `English`, `Hindi`, `Hinglish`
+  * **AI Executive Summary**: One-sentence operational summary
+  * **Suggested Action**: Practical next step for the managing committee
+* Built-in resilience: Free-tier rate limit handling with automatic fallback analysis.
+
+### ✅ Phase 3: Intelligent Complaint Clustering & Duplication Detection
+* Algorithmic grouping of duplicate or related complaints across ~100 flats.
+* Identifies shared infrastructure failures (e.g. 5 flats reporting low water pressure on the same wing pump).
+* `/api/complaints/clusters` endpoint with summary cards on the Committee Dashboard.
+* Displays **affected flats list**, **root cause summary**, and enables single-click filtering of all tickets in a cluster.
+
+### ✅ Phase 4: Committee Resolution Workflow
+* Complete ticket lifecycle: `OPEN` ➔ `ASSIGNED` ➔ `IN_PROGRESS` ➔ `RESOLVED`.
+* Quick action **"✓ Resolve"** button directly on complaint cards and table rows.
+* Resolution banner displaying resolved status, assigned personnel, and timestamps.
+* Real-time metrics updating Open, Critical, High, and Resolved ticket counters.
+
+### ✅ Phase 5A: Role-Based Access Control (RBAC) & Complaint Assignment
+* **Strict Role Separation**:
+  * **Resident**: Can submit complaints, track tickets for their own flat, view AI analysis. Cannot view other flats or society-wide clusters.
+  * **Committee**: Has full visibility across all 104 flats, staff assignment controls, cluster management, and status updates.
+* **Bearer Token Authentication**: Simulated JWT demo tokens enforced in backend middleware (`server/middleware/auth.js`).
+* **Predefined Staff Assignment**:
+  * `Ramesh (Plumber)`
+  * `Suresh (Electrician)`
+  * `Anita (Housekeeping Lead)`
+  * `Johnson Lifts Support`
+  * `Security Team`
+* **Assignment UI**:
+  * **Dashboard**: Instant assignment dropdowns and **"Assign Staff"** modal on Cards and Table views.
+  * **Complaint Details**: Dedicated **"Assign Complaint"** action inside the "Complaint Status & Progress" panel.
+
+---
+
+## 🏃 How to Run
+
+### Option 1: Local Development
+
+#### 1. Prerequisites
+* **Node.js** v18+ (tested on Node v20 & v22)
+* **npm** v9+
+
+#### 2. Install Dependencies
+```bash
+# Install root, server, and client dependencies in one command:
+npm run install:all
+```
+
+#### 3. Environment Configuration
+Create a `.env` file in the root directory (or copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+
+Ensure your `.env` contains:
+```env
+PORT=5000
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+
+# Gemini AI Key (stored only on server)
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-3.8-flash
+
+# Optional: Supabase (falls back to in-memory database if empty)
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+```
+
+#### 4. Start the Application
+You can run both client and server concurrently from the root:
+```bash
+# Terminal 1: Backend Server (Port 5000)
+npm run dev:server
+
+# Terminal 2: Frontend Client (Port 5173)
+npm run dev:client
+```
+* **Frontend**: [http://localhost:5173](http://localhost:5173)
+* **Backend API**: [http://localhost:5000/api](http://localhost:5000/api)
+* **Health Check**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+
+---
+
+### Option 2: Running on Vercel
+
+The frontend is optimized for **Vercel** deployment with single-page app (SPA) rewrite rules.
+
+#### Step 1: Connect GitHub Repository to Vercel
+1. Log into your [Vercel Dashboard](https://vercel.com).
+2. Click **Add New** ➔ **Project** and import this repository.
+
+#### Step 2: Configure Project Settings on Vercel
+* **Framework Preset**: `Vite`
+* **Root Directory**: `client`
+* **Build Command**: `npm run build`
+* **Output Directory**: `dist`
+* **Install Command**: `npm install`
+
+#### Step 3: Set Environment Variables on Vercel
+Under **Project Settings ➔ Environment Variables**, add:
+| Variable Name | Value | Description |
+|---|---|---|
+| `VITE_API_URL` | `https://your-backend-url.com/api` | The base URL of your deployed Express backend |
+
+> **Note**: If running in local or demo preview mode without a separate backend URL, `VITE_API_URL` defaults to `http://localhost:5000/api`.
+
+#### Step 4: SPA Routing Support
+The `client/vercel.json` file ensures that direct visits and page refreshes on subroutes (`/committee`, `/resident`, `/complaints/:id`) route directly to `index.html`:
+```json
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+#### Deploying the Backend (Express API)
+For a complete cloud deployment, host the Node.js backend (`/server`) on:
+* **Render**, **Railway**, **Fly.io**, or **Vercel Serverless Functions**.
+* In your backend environment settings, provide `GEMINI_API_KEY` and set `CLIENT_URL` to your Vercel deployment URL (e.g. `https://society-complaint-triage.vercel.app`).
+
+---
+
+## 🎭 Instant Demo Role Switcher
+
+For live hackathon presentations and testing, the navigation bar includes an **instant role switcher**:
+* **Sunil Mehta (Committee Member)**: View society-wide triage, cluster cards, assign staff, and mark resolved.
+* **Akash (Resident — Flat B-402)**: View personal tickets, submit complaints, and track resolution.
+
+---
+
+## 📁 Project Directory Structure
 
 ```
 society-complaint-triage/
-├── client/                     # Frontend React + Vite application
+├── client/                     # Frontend React 19 + Vite
 │   ├── src/
 │   │   ├── components/         # Reusable UI components
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── Sidebar.jsx
-│   │   │   ├── ComplaintCard.jsx
+│   │   │   ├── AssignStaffModal.jsx   # Staff assignment modal
+│   │   │   ├── ComplaintCard.jsx      # Card with actions & badges
+│   │   │   ├── Navbar.jsx             # Role-specific navigation & switcher
+│   │   │   ├── Sidebar.jsx            # Quick filters & society overview
 │   │   │   ├── StatusBadge.jsx
 │   │   │   ├── UrgencyBadge.jsx
-│   │   │   ├── CategoryBadge.jsx
-│   │   │   ├── DashboardStat.jsx
-│   │   │   ├── EmptyState.jsx
-│   │   │   └── LoadingState.jsx
-│   │   ├── pages/              # Core application pages
-│   │   │   ├── Login.jsx
-│   │   │   ├── ResidentDashboard.jsx
-│   │   │   ├── SubmitComplaint.jsx
-│   │   │   ├── MyComplaints.jsx
-│   │   │   ├── CommitteeDashboard.jsx
-│   │   │   └── ComplaintDetails.jsx
-│   │   ├── context/            # Role & Auth context
-│   │   │   └── AuthContext.jsx
-│   │   ├── services/           # Frontend API client
-│   │   │   └── api.js
-│   │   ├── App.jsx             # React router configuration
-│   │   ├── index.css           # Tailwind base styles
+│   │   │   └── CategoryBadge.jsx
+│   │   ├── constants/
+│   │   │   └── staff.js        # Predefined staff list & recommendations
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx # RBAC state & token persistence
+│   │   ├── pages/
+│   │   │   ├── CommitteeDashboard.jsx # Committee triage & clusters
+│   │   │   ├── ComplaintDetails.jsx   # Ticket detail & assignment
+│   │   │   ├── ResidentDashboard.jsx  # Resident landing
+│   │   │   ├── MyComplaints.jsx       # Resident personal tickets
+│   │   │   └── SubmitComplaint.jsx    # Complaint submission with AI
+│   │   ├── services/
+│   │   │   └── api.js          # Authenticated fetch client
+│   │   ├── App.jsx             # Role-guarded route definitions
 │   │   └── main.jsx
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   └── package.json
+│   ├── vercel.json             # Vercel SPA rewrite rules
+│   ├── package.json
+│   └── vite.config.js
 │
-├── server/                     # Backend Node.js + Express API
+├── server/                     # Backend Node.js + Express
 │   ├── config/
-│   │   ├── index.js            # Environment config loader
-│   │   ├── supabase.js         # Supabase client initialization
-│   │   └── schema.sql          # PostgreSQL table & enum schema
+│   │   ├── supabase.js         # Supabase client loader
+│   │   └── schema.sql          # PostgreSQL DDL
 │   ├── controllers/
-│   │   └── complaintController.js
+│   │   ├── authController.js   # Demo login & session verification
+│   │   └── complaintController.js # Triage, status, & assignment APIs
 │   ├── middleware/
-│   │   ├── errorHandler.js     # Centralized error handler
-│   │   └── validator.js        # Input validation
+│   │   └── auth.js             # Bearer token verification & RBAC guard
 │   ├── models/
-│   │   └── complaintModel.js   # Complaint data model & seed data
+│   │   └── complaintModel.js   # DB/in-memory store with demo seed data
 │   ├── routes/
-│   │   └── complaintRoutes.js  # Clean REST routes
+│   │   ├── authRoutes.js       # /api/auth
+│   │   └── complaintRoutes.js  # /api/complaints
 │   ├── services/
-│   │   ├── aiTriage.js         # Isolated AI triage interface (Phase 2 ready)
-│   │   └── clustering.js       # Isolated clustering interface (Phase 2 ready)
-│   ├── server.js               # Express server entry point
+│   │   ├── aiTriage.js         # Gemini 3.8 Flash inference & fallback
+│   │   └── clustering.js       # Complaint clustering algorithm
+│   ├── server.js               # Express application entry point
 │   └── package.json
 │
 ├── .env.example
-├── .gitignore
-├── package.json                # Root scripts to orchestrate client & server
+├── package.json                # Root automation scripts
 └── README.md
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🧪 Testing & Verification
 
-### 1. Prerequisites
-- **Node.js** v18+ (tested on Node v22)
-- **npm** v9+
-
-### 2. Installation
-Install all dependencies for root, server, and client:
-
+Automated test suites are included to verify functionality:
 ```bash
-# Option A: Install everything from the root
-npm run install:all
+# Verify Phase 5A Role-Based Access Control:
+node scratch/test_phase5a_rbac.js
 
-# Option B: Install manually in each directory
-cd server && npm install
-cd ../client && npm install
-```
+# Verify Committee Complaint Assignment Workflow:
+node scratch/test_committee_assignment.js
 
-### 3. Environment Setup
-Copy the example `.env` file:
-```bash
-cp .env.example .env
+# Build client production bundle:
+npm --prefix client run build
 ```
-*(Optional)* Add your Supabase credentials in `.env`. If left empty, the server automatically boots in development mode using a realistic in-memory database with pre-seeded housing society complaints.
 
 ---
 
-## 🏃 Running the Application
-
-### Start the Backend Server (Port 5000)
-```bash
-# From workspace root:
-npm run dev:server
-
-# Or inside /server:
-cd server
-npm run dev
-```
-Health check: [http://localhost:5000/api/health](http://localhost:5000/api/health)  
-Complaints API: [http://localhost:5000/api/complaints](http://localhost:5000/api/complaints)
-
-### Start the Frontend Client (Port 5173)
-```bash
-# In a new terminal from workspace root:
-npm run dev:client
-
-# Or inside /client:
-cd client
-npm run dev
-```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
----
-
-## 📋 Data Model Specification
-
-Each complaint follows this database-ready schema:
-
-| Field | Type | Description |
-|---|---|---|
-| `id` | `TEXT` / `UUID` | Unique ticket ID (e.g. `c-101`) |
-| `resident_name` | `TEXT` | Name of the resident |
-| `flat_number` | `TEXT` | Wing and flat number (e.g. `B-402`) |
-| `description` | `TEXT` | Complaint text (English/Hindi/Hinglish) |
-| `category` | `ENUM` | `WATER`, `LIFT`, `PARKING`, `NOISE`, `CLEANING`, `MAINTENANCE`, `OTHER` |
-| `urgency` | `ENUM` | `CRITICAL`, `HIGH`, `MEDIUM`, `LOW` |
-| `language` | `TEXT` | Detected language (e.g. `English`, `Hindi`, `Hinglish`) |
-| `ai_summary` | `TEXT` | Executive summary generated by AI |
-| `suggested_action`| `TEXT` | Actionable recommendation for committee |
-| `status` | `ENUM` | `OPEN`, `ASSIGNED`, `IN_PROGRESS`, `RESOLVED` |
-| `assigned_to` | `TEXT` | Staff / agency assigned (e.g. `Ramesh (Plumber)`) |
-| `cluster_id` | `TEXT` | Grouping key for duplicate/related complaints |
-| `created_at` | `TIMESTAMPTZ` | Timestamp of complaint creation |
-| `updated_at` | `TIMESTAMPTZ` | Timestamp of last status/detail update |
-
----
-
-## 🔌 API Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/complaints` | List complaints (supports `status`, `category`, `urgency`, `search` query params) |
-| `GET` | `/api/complaints/:id` | Retrieve single complaint by ID |
-| `POST` | `/api/complaints` | Create new complaint (runs AI triage & clustering services) |
-| `PATCH`| `/api/complaints/:id` | Update complaint status, assignment, or notes |
-| `DELETE`| `/api/complaints/:id`| Remove complaint ticket |
-| `GET` | `/api/complaints/stats/summary`| Aggregated metrics for committee dashboard |
-| `GET` | `/api/health` | Service health status check |
-
----
-
-## 🏛️ Architecture Rules & Isolation
-
-1. **AI Logic Isolation**: All AI triage interfaces are located in `server/services/aiTriage.js`. React components never execute direct LLM logic.
-2. **Clustering Isolation**: Complaint similarity and duplicate grouping logic is isolated in `server/services/clustering.js`.
-3. **Clean Resident UX**: Residents are **not** asked to select category or urgency manually; the AI triage pipeline automates this.
-4. **Graceful Fallback**: If Supabase credentials are not supplied, the backend seamlessly operates on realistic seed data.
-5. **Phase 2 Compatibility**: The schema, API contracts, and service interfaces are ready for Gemini API integration and vector embeddings without restructuring the project.
+## 📜 License
+MIT License. Built for modern residential communities.

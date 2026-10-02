@@ -13,9 +13,8 @@ import {
   Trash2, 
   Wrench, 
   Languages, 
-  ShieldCheck,
-  Building,
-  Save,
+  ShieldCheck, 
+  Save, 
   UserPlus
 } from 'lucide-react';
 import api from '../services/api';
@@ -130,14 +129,14 @@ export const ComplaintDetails = () => {
 
   if (error || !complaint) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-16 text-center">
-        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-        <h2 className="text-lg font-bold text-slate-900">Complaint Not Found</h2>
-        <p className="text-sm text-slate-500 mt-1">{error || 'The requested complaint ticket does not exist.'}</p>
+      <div className="max-w-md mx-auto px-4 py-16 text-center">
+        <AlertCircle className="w-10 h-10 text-rose-500 mx-auto mb-2.5" />
+        <h2 className="text-base font-bold text-slate-900">Complaint Not Found</h2>
+        <p className="text-xs text-slate-500 mt-1">{error || 'The requested complaint ticket does not exist.'}</p>
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="mt-4 px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg"
+          className="mt-4 px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg shadow-2xs hover:bg-blue-700 transition"
         >
           Return Back
         </button>
@@ -146,15 +145,15 @@ export const ComplaintDetails = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Top Navigation */}
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-5">
+      {/* Top Navigation & Actions Bar */}
       <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Complaints</span>
         </button>
 
@@ -162,148 +161,147 @@ export const ComplaintDetails = () => {
           <button
             type="button"
             onClick={handleDelete}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 px-2.5 py-1 rounded-lg hover:bg-rose-50 transition"
             title="Delete Complaint"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
             <span>Delete Ticket</span>
           </button>
         )}
       </div>
 
       {successNotice && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{successNotice}</span>
         </div>
       )}
 
-      {/* Main Ticket Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Complaint Details & AI Triage */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Core Ticket Info */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+      {/* Main Ticket Layout: 2-Column */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Left Column (2 cols): Complaint Info, AI Triage, Cluster Linking */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Section 1: Complaint Information */}
+          <div className="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">
-                  {complaint.id}
-                </span>
-                <span className="text-xs font-semibold text-slate-700 flex items-center gap-1">
-                  <Home className="w-3.5 h-3.5 text-slate-400" />
+                <span className="font-bold text-sm text-slate-900">
                   Flat {complaint.flat_number}
                 </span>
+                <span className="text-slate-300">•</span>
+                <span className="font-mono text-xs text-slate-400">
+                  #{complaint.id}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <UrgencyBadge urgency={complaint.urgency} />
-                <StatusBadge status={complaint.status} />
+              <div className="flex items-center gap-1.5">
+                <UrgencyBadge urgency={complaint.urgency} size="sm" />
+                <StatusBadge status={complaint.status} size="sm" />
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <CategoryBadge category={complaint.category} />
+            <div className="flex flex-wrap items-center gap-1.5">
+              <CategoryBadge category={complaint.category} size="sm" />
               {complaint.language && (
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-                  <Languages className="w-3.5 h-3.5 text-slate-400" />
-                  Language: {complaint.language}
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
+                  <Languages className="w-3 h-3 text-slate-400" />
+                  <span>Language: {complaint.language}</span>
                 </span>
               )}
               {complaint.cluster_id && (
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded">
-                  <Layers className="w-3.5 h-3.5" />
-                  Cluster #{complaint.cluster_id}
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">
+                  <Layers className="w-3 h-3" />
+                  <span>Cluster #{complaint.cluster_id}</span>
                 </span>
               )}
             </div>
 
             {/* Description */}
             <div>
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Resident Problem Description
               </h2>
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-800 leading-relaxed font-sans">
+              <div className="p-3.5 rounded-lg bg-slate-50/70 border border-slate-100 text-xs sm:text-sm text-slate-800 leading-relaxed font-sans">
                 {complaint.description}
               </div>
             </div>
 
-            {/* Resident & Timestamp Meta */}
-            <div className="grid grid-cols-2 gap-4 pt-2 text-xs text-slate-500">
+            {/* Resident & Timestamp Metadata */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs text-slate-500">
               <div className="flex items-center gap-1.5">
-                <User className="w-4 h-4 text-slate-400" />
+                <User className="w-3.5 h-3.5 text-slate-400" />
                 <span>
                   Reported by: <strong className="text-slate-700">{complaint.resident_name}</strong>
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-slate-400" />
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
                 <span>
-                  Logged on:{' '}
-                  <strong className="text-slate-700">
-                    {new Date(complaint.created_at).toLocaleString('en-IN')}
-                  </strong>
+                  Logged: <strong className="text-slate-700">{new Date(complaint.created_at).toLocaleString('en-IN')}</strong>
                 </span>
               </div>
             </div>
           </div>
 
-          {/* AI Triage Analysis Card */}
-          <div className="bg-gradient-to-br from-blue-50/70 via-indigo-50/50 to-white rounded-2xl border border-blue-200 p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
+          {/* Section 2: AI Triage Analysis */}
+          <div className="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-3.5">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-blue-600 text-white shadow-xs">
+                <div className="p-1 rounded-md bg-blue-50 text-blue-600">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">AI Triage Analysis</h3>
-                  <p className="text-[11px] text-slate-500">Isolated service analysis (Phase 1 Ready)</p>
+                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                    AI Triage Analysis
+                  </h3>
+                  <p className="text-[11px] text-slate-400">Gemini model automated evaluation</p>
                 </div>
               </div>
-              <span className="text-[11px] font-semibold text-blue-700 bg-blue-100/70 px-2.5 py-0.5 rounded-full">
-                Phase 1 Preview
+              <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
+                Active
               </span>
             </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <span className="font-semibold text-slate-600 block mb-1">AI Executive Summary:</span>
-                <p className="text-slate-800 bg-white/80 p-3 rounded-lg border border-blue-100 italic">
-                  "{complaint.ai_summary || 'Standard complaint registered.'}"
+                <span className="font-semibold text-slate-600 block mb-1">Executive Summary:</span>
+                <p className="text-slate-700 bg-slate-50/70 p-2.5 rounded-lg border border-slate-100 italic leading-relaxed">
+                  "{complaint.ai_summary || complaint.summary || 'Standard complaint registered.'}"
                 </p>
               </div>
 
               <div>
                 <span className="font-semibold text-slate-600 block mb-1">Recommended Action:</span>
-                <p className="text-slate-800 bg-white/80 p-3 rounded-lg border border-blue-100 flex items-start gap-2">
+                <p className="text-slate-700 bg-slate-50/70 p-2.5 rounded-lg border border-slate-100 flex items-start gap-2 leading-relaxed">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>{complaint.suggested_action || 'Assign volunteer to verify with resident.'}</span>
+                  <span>{complaint.suggested_action || 'Assign maintenance staff to inspect with resident.'}</span>
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Clustered Related Complaints if present */}
+          {/* Section 3: Clustered Related Complaints if present */}
           {clusteredComplaints.length > 0 && (
-            <div className="bg-white rounded-2xl border border-purple-200 p-6 shadow-sm space-y-3">
-              <div className="flex items-center gap-2 text-purple-900 font-bold text-sm">
-                <Layers className="w-4 h-4 text-purple-600" />
+            <div className="bg-white rounded-xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-3">
+              <div className="flex items-center gap-2 text-indigo-900 font-bold text-xs uppercase tracking-wider">
+                <Layers className="w-4 h-4 text-indigo-600" />
                 <span>Related Complaints in Same Cluster (#{complaint.cluster_id})</span>
               </div>
               <p className="text-xs text-slate-500">
-                These flats reported similar issues in the same area. Resolving this issue will likely resolve all linked tickets.
+                Similar issues reported across neighboring flats. Resolving this issue likely addresses all linked tickets.
               </p>
 
               <div className="divide-y divide-slate-100">
                 {clusteredComplaints.map((c) => (
-                  <div key={c.id} className="py-2.5 flex items-center justify-between text-xs">
-                    <div>
+                  <div key={c.id} className="py-2.5 flex items-center justify-between text-xs gap-3">
+                    <div className="truncate">
                       <span className="font-semibold text-slate-900">Flat {c.flat_number}</span> &bull; {c.resident_name}
                       <p className="text-slate-500 line-clamp-1 text-[11px] mt-0.5">{c.description}</p>
                     </div>
                     <Link
                       to={`/complaints/${c.id}`}
-                      className="text-blue-600 hover:text-blue-800 font-semibold px-2 py-1 rounded bg-blue-50"
+                      className="text-blue-600 hover:text-blue-800 font-semibold px-2.5 py-1 rounded bg-blue-50 shrink-0"
                     >
-                      View
+                      View Ticket
                     </Link>
                   </div>
                 ))}
@@ -312,27 +310,29 @@ export const ComplaintDetails = () => {
           )}
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-6">
-          {/* Complaint Status & Progress Panel */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <Clock className="w-5 h-5 text-emerald-600" />
-              <h3 className="text-sm font-bold text-slate-900">Complaint Status & Progress</h3>
+        {/* Right Column (1 col): Status, Assignment, Committee Workflow */}
+        <div className="space-y-4">
+          {/* Status & Assignment Information */}
+          <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs space-y-3.5">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
+              <Clock className="w-4 h-4 text-emerald-600" />
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Status & Assignment
+              </h3>
             </div>
 
-            <div className="space-y-3.5 text-xs">
+            <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 font-medium block mb-1">Current Ticket Status</span>
+                <span className="text-slate-400 font-medium block text-[11px] mb-1">Current Status</span>
                 <StatusBadge status={complaint.status} size="md" />
               </div>
 
               {complaint.assigned_to ? (
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between">
                   <div>
-                    <span className="text-slate-500 font-medium block text-[11px]">Assigned Personnel</span>
-                    <p className="font-bold text-slate-800 text-xs mt-0.5 flex items-center gap-1.5">
-                      <Wrench className="w-3.5 h-3.5 text-blue-600" />
+                    <span className="text-slate-400 font-medium block text-[10px]">Assigned Personnel</span>
+                    <p className="font-semibold text-slate-800 text-xs mt-0.5 flex items-center gap-1.5">
+                      <Wrench className="w-3 h-3 text-blue-600" />
                       <span>{complaint.assigned_to}</span>
                     </p>
                   </div>
@@ -343,43 +343,42 @@ export const ComplaintDetails = () => {
                       className="text-[11px] text-blue-600 hover:text-blue-800 underline font-semibold ml-2"
                       title="Reassign staff"
                     >
-                      (change)
+                      Change
                     </button>
                   )}
                 </div>
               ) : (
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 flex items-center justify-between flex-wrap gap-2">
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between flex-wrap gap-2">
                   <div>
-                    <span className="text-slate-500 font-medium block text-[11px]">Assigned Personnel</span>
-                    <p className="font-medium text-slate-600 text-xs mt-0.5">Pending committee assignment</p>
+                    <span className="text-slate-400 font-medium block text-[10px]">Assigned Personnel</span>
+                    <p className="font-medium text-slate-500 text-xs mt-0.5">Pending committee assignment</p>
                   </div>
-                  {isCommittee && (complaint.status?.toUpperCase() === 'OPEN' || !complaint.assigned_to) && (
+                  {isCommittee && (
                     <button
                       type="button"
                       onClick={() => setIsAssignModalOpen(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition"
-                      title="Assign staff to open complaint"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-2xs transition"
                     >
-                      <UserPlus className="w-3.5 h-3.5" />
-                      <span>Assign Complaint</span>
+                      <UserPlus className="w-3 h-3" />
+                      <span>Assign Staff</span>
                     </button>
                   )}
                 </div>
               )}
 
               {complaint.status === 'RESOLVED' ? (
-                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800">
-                  <span className="font-bold flex items-center gap-1.5 text-xs">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    ✅ Complaint Resolved
+                <div className="p-2.5 bg-emerald-50/70 rounded-lg border border-emerald-200 text-emerald-800 text-xs">
+                  <span className="font-bold flex items-center gap-1 text-xs">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    Resolved
                   </span>
-                  <p className="text-[11px] text-emerald-700 mt-1">
-                    This issue has been addressed and closed by society management.
+                  <p className="text-[11px] text-emerald-700 mt-0.5">
+                    This ticket has been completed and verified.
                   </p>
                 </div>
               ) : (
-                <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-slate-600 text-[11px] leading-relaxed">
-                  Your complaint is under active tracking by the Managing Committee. You will see live status updates here.
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 text-slate-500 text-[11px] leading-relaxed">
+                  Active ticket. Real-time updates reflect automatically.
                 </div>
               )}
             </div>
@@ -387,33 +386,35 @@ export const ComplaintDetails = () => {
 
           {/* Committee Action Workflow (Only visible to Committee members) */}
           {isCommittee && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <ShieldCheck className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-sm font-bold text-slate-900">Committee Resolution Workflow</h3>
+            <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs space-y-3.5">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Committee Workflow
+                </h3>
               </div>
 
-              <form onSubmit={handleUpdate} className="space-y-4 text-xs">
+              <form onSubmit={handleUpdate} className="space-y-3 text-xs">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1" htmlFor="statusSelect">
-                    Ticket Status
+                    Update Status
                   </label>
                   <select
                     id="statusSelect"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 font-medium focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-800 font-medium focus:ring-1 focus:ring-blue-500 text-xs"
                   >
                     <option value="OPEN">OPEN (Unassigned)</option>
                     <option value="ASSIGNED">ASSIGNED (Staff dispatched)</option>
-                    <option value="IN_PROGRESS">IN_PROGRESS (Under repair)</option>
+                    <option value="IN_PROGRESS">IN PROGRESS (Under repair)</option>
                     <option value="RESOLVED">RESOLVED (Closed)</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1" htmlFor="assignedInput">
-                    Assigned Personnel / Agency
+                    Assigned Staff / Vendor
                   </label>
                   <input
                     id="assignedInput"
@@ -421,14 +422,16 @@ export const ComplaintDetails = () => {
                     value={assignedTo}
                     onChange={(e) => setAssignedTo(e.target.value)}
                     placeholder="e.g. Ramesh (Plumber), Johnson Lifts"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-800 focus:ring-1 focus:ring-blue-500 text-xs"
                   />
                 </div>
 
                 {/* Quick staff picker helpers */}
-                <div className="space-y-1.5 pt-1">
-                  <span className="text-[11px] font-medium text-slate-400 block">Quick Assign Staff:</span>
-                  <div className="flex flex-wrap gap-1.5">
+                <div className="space-y-1 pt-1">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Quick Assign Staff:
+                  </span>
+                  <div className="flex flex-wrap gap-1">
                     {SOCIETY_STAFF.map((staff) => (
                       <button
                         key={staff}
@@ -437,7 +440,7 @@ export const ComplaintDetails = () => {
                           setAssignedTo(staff);
                           if (status === 'OPEN') setStatus('ASSIGNED');
                         }}
-                        className="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px] font-medium"
+                        className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 hover:bg-slate-200 text-[11px] font-medium"
                       >
                         {staff}
                       </button>
@@ -448,23 +451,23 @@ export const ComplaintDetails = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="w-full mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm disabled:opacity-50"
+                  className="w-full mt-2 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-2xs disabled:opacity-50"
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className="w-3.5 h-3.5" />
                   <span>{saving ? 'Updating...' : 'Save Resolution Updates'}</span>
                 </button>
               </form>
             </div>
           )}
 
-          {/* Society Contact Quick Card */}
-          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 text-xs space-y-2 text-slate-600">
-            <span className="font-semibold text-slate-800 uppercase tracking-wider text-[11px] block">
+          {/* Society Emergency Contacts Card */}
+          <div className="bg-slate-50/80 rounded-xl border border-slate-200/80 p-4 text-xs space-y-1.5 text-slate-500">
+            <span className="font-semibold text-slate-700 uppercase tracking-wider text-[10px] block">
               Emergency Society Contacts
             </span>
-            <p>&bull; Security Gate 1: +91 98200 11223</p>
-            <p>&bull; Society Electrician: +91 98200 44556</p>
-            <p>&bull; Lift Emergency Helpline: 1800 209 5438</p>
+            <p>• Security Gate: +91 98200 11223</p>
+            <p>• Society Electrician: +91 98200 44556</p>
+            <p>• Lift Helpline: 1800 209 5438</p>
           </div>
         </div>
       </div>
@@ -481,3 +484,4 @@ export const ComplaintDetails = () => {
 };
 
 export default ComplaintDetails;
+

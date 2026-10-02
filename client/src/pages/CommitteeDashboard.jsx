@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   AlertCircle, 
   AlertTriangle, 
@@ -11,26 +11,22 @@ import {
   RefreshCw, 
   LayoutGrid, 
   List, 
-  ArrowUpDown,
-  Download,
-  Building,
   Sparkles,
-  UserCheck,
-  UserPlus
+  UserPlus,
+  X
 } from 'lucide-react';
 import api from '../services/api';
 import DashboardStat from '../components/DashboardStat';
 import ComplaintCard from '../components/ComplaintCard';
-import StatusBadge from '../components/StatusBadge';
 import UrgencyBadge from '../components/UrgencyBadge';
 import CategoryBadge from '../components/CategoryBadge';
 import LoadingState from '../components/LoadingState';
 import EmptyState from '../components/EmptyState';
 import Sidebar from '../components/Sidebar';
 import AssignStaffModal from '../components/AssignStaffModal';
-import { SOCIETY_STAFF } from '../constants/staff';
 
 export const CommitteeDashboard = () => {
+  const location = useLocation();
   const [complaints, setComplaints] = useState([]);
   const [stats, setStats] = useState({
     total: 0,
@@ -81,6 +77,20 @@ export const CommitteeDashboard = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Smooth scroll to anchor if hash is present
+  useEffect(() => {
+    if (location.hash) {
+      const timer = setTimeout(() => {
+        const id = location.hash.replace('#', '');
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash]);
 
   // Quick status update handler for committee members
   const handleStatusChange = async (id, newStatus) => {
@@ -167,7 +177,7 @@ export const CommitteeDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
+    <div className="flex min-h-[calc(100vh-3.75rem)] bg-slate-50/50">
       {/* Sidebar with Society Overview & Quick Views */}
       <Sidebar
         stats={stats}
@@ -189,24 +199,24 @@ export const CommitteeDashboard = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                Committee Portal
+              <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/70">
+                Managing Committee
               </span>
-              <span className="text-xs text-slate-500">Managing Committee Workspace</span>
+              <span className="text-xs text-slate-400">Green Meadows CHS • 104 Flats</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               Complaint Triage Dashboard
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Triage, monitor urgency, assign staff, and track resolution across 104 society flats.
+              Review incoming issues, evaluate automated AI triage, link clusters, and assign staff.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={loadData}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-2xs"
               title="Refresh data"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
@@ -215,21 +225,15 @@ export const CommitteeDashboard = () => {
 
             <Link
               to="/submit"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition shadow-2xs"
             >
               <span>+ Log Complaint</span>
             </Link>
           </div>
         </div>
 
-        {/* Dashboard Statistics Cards per Requirements:
-            - Total complaints
-            - Critical complaints
-            - High priority complaints
-            - Open complaints
-            - Resolved complaints
-        */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        {/* Dashboard Statistics KPI Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
           <DashboardStat
             title="Total Complaints"
             value={stats.total}
@@ -278,10 +282,10 @@ export const CommitteeDashboard = () => {
 
         {/* COMPLAINT CLUSTERS (Phase 3 Rule-Based Grouping) */}
         {clusters.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+          <div id="clusters" className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs space-y-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-purple-100 text-purple-700">
+                <div className="p-1 rounded-md bg-indigo-50 text-indigo-600">
                   <Layers className="w-4 h-4" />
                 </div>
                 <div>
@@ -289,12 +293,12 @@ export const CommitteeDashboard = () => {
                     <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                       Complaint Clusters
                     </h2>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/60">
                       {clusters.length} Active {clusters.length === 1 ? 'Cluster' : 'Clusters'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500">
-                    Recognize systemic issues affecting multiple residents in one place
+                  <p className="text-[11px] text-slate-400">
+                    Systemic issues automatically grouped across multiple flats
                   </p>
                 </div>
               </div>
@@ -303,80 +307,106 @@ export const CommitteeDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedClusterId(null)}
-                  className="text-xs text-purple-700 hover:text-purple-900 font-semibold underline"
+                  className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold hover:underline"
                 >
-                  Show All Complaints
+                  Clear Cluster Filter
                 </button>
               )}
             </div>
 
             {/* Clusters Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {clusters.map((cluster) => {
                 const isSelected = selectedClusterId === cluster.cluster_id;
-                const isCritical = cluster.urgency === 'CRITICAL';
-                const isHigh = cluster.urgency === 'HIGH';
-
-                // Dot indicator color
-                const dotColor = isCritical
-                  ? 'bg-red-500'
-                  : isHigh
-                  ? 'bg-amber-500'
-                  : 'bg-blue-500';
+                const relatedComplaints = complaints.filter(
+                  (c) => c.cluster_id === cluster.cluster_id || (cluster.complaint_ids && cluster.complaint_ids.includes(c.id))
+                );
 
                 return (
                   <div
                     key={cluster.cluster_id}
-                    className={`rounded-xl border p-4 transition-all flex flex-col justify-between ${
+                    className={`rounded-xl border p-4 transition-all duration-200 flex flex-col justify-between ${
                       isSelected
-                        ? 'border-purple-500 ring-2 ring-purple-100 bg-purple-50/20 shadow-sm'
-                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/30'
+                        ? 'border-indigo-500 ring-2 ring-indigo-500/15 bg-indigo-50/20 shadow-xs'
+                        : 'border-slate-200/90 hover:border-slate-300 bg-white hover:bg-slate-50/50 shadow-2xs'
                     }`}
                   >
-                    <div>
-                      {/* Top Row: Category + Location and Urgency */}
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="font-bold text-xs tracking-wider text-slate-900 uppercase flex items-center gap-1.5">
-                          <span className={`w-2.5 h-2.5 rounded-full ${dotColor} ${isCritical ? 'animate-pulse' : ''}`} />
-                          {cluster.category} {cluster.title.includes('Wing') ? `— ${cluster.title.split(' ')[0]}` : cluster.title.includes('Tower') ? `— ${cluster.title.split(' ')[0]} ${cluster.title.split(' ')[1]}` : ''}
-                        </span>
+                    <div className="space-y-2.5">
+                      {/* Top Row: Category + Urgency */}
+                      <div className="flex items-center justify-between gap-2">
+                        <CategoryBadge category={cluster.category} size="sm" />
                         <UrgencyBadge urgency={cluster.urgency} size="sm" />
                       </div>
 
                       {/* Complaint count & title */}
-                      <p className="text-xs font-semibold text-slate-600">
-                        {cluster.complaint_count} related complaints
-                      </p>
-                      <h3 className="text-sm font-bold text-slate-900 mt-0.5">
-                        {cluster.title}
-                      </h3>
-
-                      {/* Affected flats list */}
-                      {cluster.affected_flats && cluster.affected_flats.length > 0 && (
-                        <div className="mt-2.5 text-xs text-slate-600 flex items-center flex-wrap gap-1">
-                          <span className="text-[11px] text-slate-400 font-medium mr-0.5">Flats:</span>
-                          <span className="font-medium text-slate-800">
-                            {cluster.affected_flats.join(' • ')}
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                          {cluster.title}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1 flex items-center flex-wrap gap-1.5">
+                          <span className="font-semibold text-indigo-700">
+                            {cluster.complaint_count || relatedComplaints.length}
                           </span>
+                          <span>related complaints</span>
+                          {cluster.affected_flats && cluster.affected_flats.length > 0 && (
+                            <>
+                              <span className="text-slate-300">&bull;</span>
+                              <span className="text-slate-600 truncate">
+                                Flats: {cluster.affected_flats.join(', ')}
+                              </span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+
+                      {/* Related Complaints List Preview */}
+                      {relatedComplaints.length > 0 && (
+                        <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Related Complaints
+                          </p>
+                          <div className="space-y-1">
+                            {relatedComplaints.slice(0, 2).map((rc) => (
+                              <div
+                                key={rc.id}
+                                className="text-[11px] text-slate-600 bg-slate-50/80 rounded px-2 py-1 border border-slate-100 flex items-center justify-between gap-2"
+                              >
+                                <span className="font-semibold text-slate-800 shrink-0">
+                                  {rc.flat_number || 'Flat'}:
+                                </span>
+                                <span className="truncate text-slate-500">
+                                  {rc.summary || rc.description}
+                                </span>
+                                <span className="text-[9px] font-mono text-slate-400 shrink-0">
+                                  #{rc.id.slice(0, 4)}
+                                </span>
+                              </div>
+                            ))}
+                            {relatedComplaints.length > 2 && (
+                              <p className="text-[10px] text-slate-400 italic">
+                                +{relatedComplaints.length - 2} more flat reports
+                              </p>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
 
                     {/* Footer Button: View Complaints */}
-                    <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between">
-                      <span className="text-[11px] font-mono text-slate-400">
+                    <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[10px] font-mono text-slate-400">
                         #{cluster.cluster_id}
                       </span>
                       <button
                         type="button"
                         onClick={() => setSelectedClusterId(isSelected ? null : cluster.cluster_id)}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
                           isSelected
-                            ? 'bg-purple-600 text-white shadow-xs'
-                            : 'bg-white border border-slate-300 text-slate-700 hover:border-purple-300 hover:text-purple-700'
+                            ? 'bg-indigo-600 text-white shadow-2xs hover:bg-indigo-700'
+                            : 'bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200'
                         }`}
                       >
-                        {isSelected ? 'Viewing Filtered' : 'View Complaints'}
+                        {isSelected ? 'Viewing Filtered' : 'Filter Complaints'}
                       </button>
                     </div>
                   </div>
@@ -388,9 +418,9 @@ export const CommitteeDashboard = () => {
 
         {/* Active Cluster Filter Indicator Banner */}
         {selectedClusterId && (
-          <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl flex items-center justify-between text-xs text-purple-900">
+          <div className="p-3 bg-indigo-50/80 border border-indigo-200/80 rounded-xl flex items-center justify-between text-xs text-indigo-900">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-purple-600" />
+              <Layers className="w-4 h-4 text-indigo-600" />
               <span>
                 Filtered by Cluster: <strong>{selectedClusterId}</strong> ({filteredComplaints.length} tickets matching)
               </span>
@@ -398,37 +428,38 @@ export const CommitteeDashboard = () => {
             <button
               type="button"
               onClick={() => setSelectedClusterId(null)}
-              className="text-xs font-bold text-purple-700 hover:text-purple-900 underline"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 hover:text-indigo-900 hover:underline"
             >
-              Show All Complaints
+              <X className="w-3.5 h-3.5" />
+              <span>Show All</span>
             </button>
           </div>
         )}
 
-        {/* Filters and Search Control Panel */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3.5">
+        {/* Filters and Search Control Toolbar */}
+        <div id="complaints" className="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs space-y-3">
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by keywords, flat (e.g. B-402), resident name, or issue..."
-                className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50/50"
+                className="w-full pl-9 pr-4 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50/50 placeholder:text-slate-400"
               />
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-1.5 self-end md:self-auto">
+            <div className="flex items-center gap-1 self-end md:self-auto">
               <button
                 type="button"
                 onClick={() => setViewMode('cards')}
-                className={`p-2 rounded-lg border transition ${
+                className={`p-1.5 rounded-lg border transition ${
                   viewMode === 'cards'
                     ? 'bg-slate-100 border-slate-300 text-blue-700'
-                    : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                    : 'border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-50'
                 }`}
                 title="Card View"
                 aria-label="Card View"
@@ -438,10 +469,10 @@ export const CommitteeDashboard = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('table')}
-                className={`p-2 rounded-lg border transition ${
+                className={`p-1.5 rounded-lg border transition ${
                   viewMode === 'table'
                     ? 'bg-slate-100 border-slate-300 text-blue-700'
-                    : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                    : 'border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-50'
                 }`}
                 title="Table View"
                 aria-label="Table View"
@@ -451,109 +482,94 @@ export const CommitteeDashboard = () => {
             </div>
           </div>
 
-          {/* Quick Status Filter Tabs (Phase 4 Workflow) */}
-          <div className="flex flex-wrap items-center gap-1.5 pb-2 border-b border-slate-100">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1">
-              Workflow Status:
-            </span>
-            {[
-              { id: 'ALL', label: 'ALL' },
-              { id: 'OPEN', label: 'OPEN' },
-              { id: 'ASSIGNED', label: 'ASSIGNED' },
-              { id: 'IN_PROGRESS', label: 'IN PROGRESS' },
-              { id: 'RESOLVED', label: 'RESOLVED' }
-            ].map((tab) => {
-              const isActive = statusFilter === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setStatusFilter(tab.id)}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-600'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+          {/* Quick Status Filter Tabs */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100">
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
+              {[
+                { id: 'ALL', label: 'All' },
+                { id: 'OPEN', label: 'Open' },
+                { id: 'ASSIGNED', label: 'Assigned' },
+                { id: 'IN_PROGRESS', label: 'In Progress' },
+                { id: 'RESOLVED', label: 'Resolved' }
+              ].map((tab) => {
+                const isActive = statusFilter === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setStatusFilter(tab.id)}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                      isActive
+                        ? 'bg-slate-900 text-white shadow-2xs'
+                        : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* Filter Dropdowns */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs">
-            <span className="text-slate-400 font-semibold uppercase tracking-wider text-[11px] flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" />
-              Filters:
-            </span>
-
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
-              aria-label="Filter by Status"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="OPEN">Open</option>
-              <option value="ASSIGNED">Assigned</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="RESOLVED">Resolved</option>
-            </select>
-
-            {/* Category Filter */}
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
-              aria-label="Filter by Category"
-            >
-              <option value="ALL">All Categories</option>
-              <option value="WATER">Water Supply</option>
-              <option value="LIFT">Lift / Elevator</option>
-              <option value="PARKING">Parking</option>
-              <option value="NOISE">Noise</option>
-              <option value="CLEANING">Cleaning</option>
-              <option value="MAINTENANCE">Maintenance</option>
-              <option value="OTHER">Other</option>
-            </select>
-
-            {/* Urgency Filter */}
-            <select
-              value={urgencyFilter}
-              onChange={(e) => setUrgencyFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-medium focus:ring-1 focus:ring-blue-500"
-              aria-label="Filter by Urgency"
-            >
-              <option value="ALL">All Urgencies</option>
-              <option value="CRITICAL">Critical</option>
-              <option value="HIGH">High</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="LOW">Low</option>
-            </select>
-
-            {/* Reset Filters */}
-            {(statusFilter !== 'ALL' || categoryFilter !== 'ALL' || urgencyFilter !== 'ALL' || searchTerm || selectedClusterId) && (
-              <button
-                type="button"
-                onClick={() => {
-                  setStatusFilter('ALL');
-                  setCategoryFilter('ALL');
-                  setUrgencyFilter('ALL');
-                  setSearchTerm('');
-                  setSelectedClusterId(null);
-                }}
-                className="text-xs text-blue-600 hover:text-blue-800 font-medium underline ml-auto"
+            {/* Filter Dropdowns */}
+            <div className="flex items-center gap-2 text-xs">
+              <Filter className="w-3.5 h-3.5 text-slate-400" />
+              
+              {/* Category Filter */}
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-2 py-1 rounded-md border border-slate-200 bg-white text-slate-700 text-xs font-medium focus:ring-1 focus:ring-blue-500"
+                aria-label="Filter by Category"
               >
-                Reset Filters
-              </button>
-            )}
+                <option value="ALL">All Categories</option>
+                <option value="WATER">Water Supply</option>
+                <option value="LIFT">Lift / Elevator</option>
+                <option value="PARKING">Parking</option>
+                <option value="NOISE">Noise</option>
+                <option value="CLEANING">Cleaning</option>
+                <option value="MAINTENANCE">Maintenance</option>
+                <option value="OTHER">Other</option>
+              </select>
 
-            <div className="ml-auto text-[11px] text-slate-500 font-medium">
-              Showing {filteredComplaints.length} of {complaints.length} complaints
+              {/* Urgency Filter */}
+              <select
+                value={urgencyFilter}
+                onChange={(e) => setUrgencyFilter(e.target.value)}
+                className="px-2 py-1 rounded-md border border-slate-200 bg-white text-slate-700 text-xs font-medium focus:ring-1 focus:ring-blue-500"
+                aria-label="Filter by Urgency"
+              >
+                <option value="ALL">All Urgencies</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
+
+              {/* Reset Filters */}
+              {(statusFilter !== 'ALL' || categoryFilter !== 'ALL' || urgencyFilter !== 'ALL' || searchTerm || selectedClusterId) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStatusFilter('ALL');
+                    setCategoryFilter('ALL');
+                    setUrgencyFilter('ALL');
+                    setSearchTerm('');
+                    setSelectedClusterId(null);
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-semibold hover:underline ml-1"
+                >
+                  Reset
+                </button>
+              )}
             </div>
           </div>
+        </div>
+
+        {/* Complaints Count Subtitle */}
+        <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+          <span>
+            Showing <strong className="text-slate-700 font-semibold">{filteredComplaints.length}</strong> of {complaints.length} tickets
+          </span>
         </div>
 
         {/* Content Render: Cards View or Table View */}
@@ -573,7 +589,7 @@ export const CommitteeDashboard = () => {
             }}
           />
         ) : viewMode === 'cards' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredComplaints.map((complaint) => (
               <ComplaintCard
                 key={complaint.id}
@@ -587,15 +603,15 @@ export const CommitteeDashboard = () => {
           </div>
         ) : (
           /* Table View */
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-slate-600">
-                <thead className="bg-slate-50 text-[11px] font-semibold uppercase text-slate-500 border-b border-slate-200">
+                <thead className="bg-slate-50 text-[11px] font-semibold uppercase text-slate-400 border-b border-slate-200">
                   <tr>
                     <th scope="col" className="px-4 py-3">Flat & Resident</th>
                     <th scope="col" className="px-4 py-3">Category</th>
                     <th scope="col" className="px-4 py-3">Urgency</th>
-                    <th scope="col" className="px-4 py-3">Description & AI Triage</th>
+                    <th scope="col" className="px-4 py-3">Description & AI Summary</th>
                     <th scope="col" className="px-4 py-3">Assigned To</th>
                     <th scope="col" className="px-4 py-3">Status</th>
                     <th scope="col" className="px-4 py-3">Cluster</th>
@@ -604,10 +620,10 @@ export const CommitteeDashboard = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {filteredComplaints.map((c) => (
-                    <tr key={c.id} className="hover:bg-slate-50/75 transition">
+                    <tr key={c.id} className="hover:bg-slate-50/60 transition-colors">
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="font-semibold text-slate-900">Flat {c.flat_number}</div>
-                        <div className="text-[11px] text-slate-500">{c.resident_name}</div>
+                        <div className="text-[11px] text-slate-400">{c.resident_name}</div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <CategoryBadge category={c.category} size="sm" />
@@ -620,26 +636,20 @@ export const CommitteeDashboard = () => {
                           {c.description}
                         </div>
                         {(c.ai_summary || c.summary) && (
-                          <div className="text-[11px] text-blue-700 italic flex items-center gap-1 line-clamp-1 mt-0.5" title={c.ai_summary || c.summary}>
+                          <div className="text-[11px] text-slate-500 italic flex items-center gap-1 line-clamp-1 mt-0.5" title={c.ai_summary || c.summary}>
                             <Sparkles className="w-3 h-3 text-blue-500 shrink-0" />
                             <span>{c.ai_summary || c.summary}</span>
-                          </div>
-                        )}
-                        {c.suggested_action && (
-                          <div className="text-[10px] text-emerald-700 flex items-center gap-1 line-clamp-1 mt-0.5" title={c.suggested_action}>
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                            <span>Action: {c.suggested_action}</span>
                           </div>
                         )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         {c.assigned_to ? (
                           <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-slate-800">{c.assigned_to}</span>
+                            <span className="font-medium text-slate-800">{c.assigned_to}</span>
                             <button
                               type="button"
                               onClick={() => setAssigningComplaint(c)}
-                              className="text-[11px] text-blue-600 hover:text-blue-800 underline font-medium"
+                              className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold hover:underline"
                               title="Reassign staff"
                             >
                               (change)
@@ -649,68 +659,50 @@ export const CommitteeDashboard = () => {
                           <button
                             type="button"
                             onClick={() => setAssigningComplaint(c)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition shadow-2xs"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
                             title="Assign staff to this complaint"
-                          >
-                            <UserPlus className="w-3.5 h-3.5" />
-                            <span>Assign Staff</span>
-                          </button>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <select
-                            value={c.status}
-                            onChange={(e) => handleStatusChange(c.id, e.target.value)}
-                            className={`px-2 py-1 text-xs border rounded font-semibold focus:ring-1 focus:ring-blue-500 ${
-                              c.status === 'RESOLVED'
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                : c.status === 'IN_PROGRESS'
-                                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                : c.status === 'ASSIGNED'
-                                ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                : 'bg-white text-slate-700 border-slate-300'
-                            }`}
-                          >
-                            <option value="OPEN">OPEN</option>
-                            <option value="ASSIGNED">ASSIGNED</option>
-                            <option value="IN_PROGRESS">IN_PROGRESS</option>
-                            <option value="RESOLVED">RESOLVED</option>
-                          </select>
-                          {c.status === 'RESOLVED' && (
-                            <span className="text-emerald-600 font-bold text-xs" title="Resolved">
-                              ✓
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        {c.cluster_id ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded">
-                            <Layers className="w-3 h-3" />
-                            {c.cluster_id}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400 text-[11px]">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        {(!c.assigned_to || c.status === 'OPEN') && (
-                          <button
-                            type="button"
-                            onClick={() => setAssigningComplaint(c)}
-                            className="text-xs font-bold text-blue-600 hover:text-blue-800 mr-2.5 inline-flex items-center gap-1"
-                            title="Assign staff"
                           >
                             <UserPlus className="w-3 h-3" />
                             <span>Assign</span>
                           </button>
                         )}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <select
+                          value={c.status}
+                          onChange={(e) => handleStatusChange(c.id, e.target.value)}
+                          className={`px-2 py-1 text-[11px] border rounded-md font-semibold bg-white focus:ring-1 focus:ring-blue-500 ${
+                            c.status === 'RESOLVED'
+                              ? 'text-emerald-700 border-emerald-200 bg-emerald-50/50'
+                              : c.status === 'IN_PROGRESS'
+                              ? 'text-amber-700 border-amber-200 bg-amber-50/50'
+                              : c.status === 'ASSIGNED'
+                              ? 'text-blue-700 border-blue-200 bg-blue-50/50'
+                              : 'text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          <option value="OPEN">OPEN</option>
+                          <option value="ASSIGNED">ASSIGNED</option>
+                          <option value="IN_PROGRESS">IN PROGRESS</option>
+                          <option value="RESOLVED">RESOLVED</option>
+                        </select>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {c.cluster_id ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-1.5 py-0.2 rounded">
+                            <Layers className="w-3 h-3" />
+                            {c.cluster_id}
+                          </span>
+                        ) : (
+                          <span className="text-slate-300 text-[11px]">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
                         <Link
                           to={`/complaints/${c.id}`}
-                          className="text-xs font-semibold text-slate-600 hover:text-slate-900"
+                          className="text-xs font-semibold text-blue-600 hover:text-blue-800"
                         >
-                          View
+                          View Details
                         </Link>
                       </td>
                     </tr>
@@ -734,3 +726,4 @@ export const CommitteeDashboard = () => {
 };
 
 export default CommitteeDashboard;
+

@@ -1,30 +1,30 @@
 import React from 'react';
-import { AlertCircle, AlertTriangle, Info, Clock } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Clock } from 'lucide-react';
 
 const URGENCY_CONFIG = {
   CRITICAL: {
     label: 'Critical',
     icon: AlertCircle,
-    classes: 'bg-red-50 text-red-700 border-red-200',
-    iconClass: 'text-red-600'
+    classes: 'bg-rose-50 text-rose-700 border-rose-200/80 font-semibold',
+    iconClass: 'text-rose-600'
   },
   HIGH: {
     label: 'High',
     icon: AlertTriangle,
-    classes: 'bg-amber-50 text-amber-800 border-amber-200',
+    classes: 'bg-amber-50 text-amber-800 border-amber-200/80 font-medium',
     iconClass: 'text-amber-600'
   },
   MEDIUM: {
     label: 'Medium',
-    icon: Info,
-    classes: 'bg-sky-50 text-sky-800 border-sky-200',
-    iconClass: 'text-sky-600'
+    icon: null,
+    classes: 'bg-slate-100 text-slate-700 border-slate-200/80 font-medium',
+    iconClass: 'text-slate-500'
   },
   LOW: {
     label: 'Low',
-    icon: Clock,
-    classes: 'bg-slate-100 text-slate-700 border-slate-200',
-    iconClass: 'text-slate-500'
+    icon: null,
+    classes: 'bg-slate-50 text-slate-500 border-slate-200/60 font-normal',
+    iconClass: 'text-slate-400'
   }
 };
 
@@ -34,18 +34,19 @@ export const UrgencyBadge = ({ urgency = 'MEDIUM', size = 'md', showIcon = true 
   const Icon = config.icon;
 
   const sizeClasses = size === 'sm' 
-    ? 'px-2 py-0.5 text-xs' 
-    : 'px-2.5 py-1 text-xs font-semibold';
+    ? 'px-2 py-0.5 text-[11px]' 
+    : 'px-2.5 py-0.5 text-xs';
 
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full border ${config.classes} ${sizeClasses} tracking-tight`}
       title={`Urgency: ${config.label}`}
     >
-      {showIcon && <Icon className={`w-3.5 h-3.5 ${config.iconClass}`} aria-hidden="true" />}
+      {showIcon && Icon && <Icon className={`w-3 h-3 ${config.iconClass}`} aria-hidden="true" />}
       <span>{config.label}</span>
     </span>
   );
 };
 
 export default UrgencyBadge;
+

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   PlusCircle, 
   Sparkles, 
-  HelpCircle, 
-  Home, 
   Clock, 
   CheckCircle2, 
   ArrowRight,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Building,
+  Info
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -20,6 +20,7 @@ import DashboardStat from '../components/DashboardStat';
 
 export const ResidentDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +31,6 @@ export const ResidentDashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      // Fetch all complaints, and highlight/focus on resident flat
       const data = await api.getComplaints();
       setComplaints(data);
     } catch (err) {
@@ -54,29 +54,35 @@ export const ResidentDashboard = () => {
   const myResolved = myComplaints.filter((c) => c.status === 'RESOLVED').length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-7">
       {/* Welcome & Top Action Banner */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               Resident Portal
             </span>
-            <span className="text-xs text-slate-500">Green Meadows CHS</span>
+            <span className="text-xs text-slate-400 font-medium">Green Meadows CHS</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Welcome, {user?.name || 'Resident'}
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
-            Registered Flat: <strong className="text-slate-800">{flatNumber}</strong> &bull; Lodge and track your maintenance issues seamlessly.
+          <p className="text-sm text-slate-500 mt-1 flex items-center flex-wrap gap-2">
+            <span>Registered Flat:</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md font-semibold text-xs bg-slate-100 text-slate-800 border border-slate-200">
+              {flatNumber}
+            </span>
+            <span className="text-slate-300">&bull;</span>
+            <span>Lodge and track your maintenance issues with automated AI triage.</span>
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-3 w-full md:w-auto">
           <button
             type="button"
             onClick={fetchResidentComplaints}
-            className="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition"
+            className="p-2.5 rounded-xl border border-slate-200/80 hover:bg-slate-50 text-slate-600 transition shadow-2xs hover:border-slate-300"
             title="Refresh Complaints"
             aria-label="Refresh Complaints"
           >
@@ -85,7 +91,7 @@ export const ResidentDashboard = () => {
           
           <Link
             to="/submit"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shadow-xs hover:shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Submit Complaint</span>
@@ -94,11 +100,13 @@ export const ResidentDashboard = () => {
       </div>
 
       {/* AI Assistance Tip Box */}
-      <div className="bg-gradient-to-r from-blue-50/60 to-indigo-50/60 border border-blue-100 rounded-xl p-4 sm:p-5 flex items-start gap-3">
-        <Sparkles className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-        <div className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-          <strong className="text-blue-900 font-semibold">Messy or Hinglish complaint? No problem! </strong>
-          You can write in English, Hindi, or Hinglish. Our AI triage system will automatically evaluate urgency, detect category, and link related issues across society flats.
+      <div className="bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/50 border border-blue-100/80 rounded-xl p-4 sm:p-4.5 flex items-start gap-3 shadow-2xs">
+        <div className="p-1.5 rounded-lg bg-blue-100/70 text-blue-600 shrink-0 mt-0.5">
+          <Sparkles className="w-4 h-4" />
+        </div>
+        <div className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          <strong className="text-blue-900 font-semibold">Write in Hindi, English, or Hinglish: </strong>
+          No need to format complaints or choose technical categories. The AI triage engine automatically assesses urgency, detects affected services, generates structured summaries, and links issues to ongoing society clusters.
         </div>
       </div>
 
@@ -109,35 +117,35 @@ export const ResidentDashboard = () => {
           value={myOpen}
           icon={Clock}
           color="indigo"
-          subtitle={`For flat ${flatNumber}`}
+          subtitle={`Awaiting resolution for ${flatNumber}`}
         />
         <DashboardStat
           title="In Progress"
           value={myInProgress}
           icon={RefreshCw}
           color="amber"
-          subtitle="Work underway"
+          subtitle="Staff currently working"
         />
         <DashboardStat
           title="Resolved"
           value={myResolved}
           icon={CheckCircle2}
           color="emerald"
-          subtitle="Closed issues"
+          subtitle="Closed & verified"
         />
       </div>
 
       {/* Error Banner */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4" />
+        <div className="p-4 bg-red-50 border border-red-200/80 rounded-xl text-red-700 text-sm flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={fetchResidentComplaints}
-            className="text-xs font-semibold underline hover:text-red-900"
+            className="text-xs font-semibold text-red-800 underline hover:text-red-950"
           >
             Retry
           </button>
@@ -148,18 +156,25 @@ export const ResidentDashboard = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">My Flat Complaints</h2>
-            <p className="text-xs text-slate-500">
-              Showing complaints registered for Flat {flatNumber}
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">My Flat Complaints</h2>
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                {myComplaints.length}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Issues registered for Flat {flatNumber}
             </p>
           </div>
-          <Link
-            to="/my-complaints"
-            className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
-          >
-            <span>View All</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          {myComplaints.length > 0 && (
+            <Link
+              to="/my-complaints"
+              className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 group"
+            >
+              <span>View All</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
+            </Link>
+          )}
         </div>
 
         {loading ? (
@@ -167,9 +182,9 @@ export const ResidentDashboard = () => {
         ) : myComplaints.length === 0 ? (
           <EmptyState
             title={`No complaints logged for Flat ${flatNumber}`}
-            description="Have an issue with water, lift, parking, or cleanliness? Lodge a new complaint and the managing committee will be alerted."
+            description="Have an issue with water, plumbing, lift, electricals, or cleanliness? Lodge a new complaint and the managing committee will be alerted immediately."
             actionText="Submit Complaint"
-            onAction={() => window.location.href = '/submit'}
+            onAction={() => navigate('/submit')}
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -185,12 +200,15 @@ export const ResidentDashboard = () => {
       </div>
 
       {/* Society Recent Activity / Community Awareness */}
-      <div className="space-y-4 pt-4 border-t border-slate-200">
+      <div className="space-y-4 pt-6 border-t border-slate-200/80">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-slate-800">Recent Society Notices & Complaints</h2>
-            <p className="text-xs text-slate-500">
-              Transparency feed: Recent public issues reported in society
+            <div className="flex items-center gap-2">
+              <Building className="w-4 h-4 text-slate-400" />
+              <h2 className="text-base font-bold text-slate-900">Recent Society Notices & Complaints</h2>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Transparency feed: View recently reported society issues to avoid duplicate filings
             </p>
           </div>
         </div>

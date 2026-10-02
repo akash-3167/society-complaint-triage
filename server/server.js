@@ -12,11 +12,17 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const app = express();
 
 // Middlewares
-app.use(cors({
-  origin: '*', // Allow Vite client during development
+const corsOptions = {
+  origin: [
+    'https://society-complaint-triage-beta.vercel.app',
+    'http://localhost:5173'
+  ],
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
-}));
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

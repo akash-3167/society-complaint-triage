@@ -49,13 +49,16 @@ app.use(errorHandler);
 
 const PORT = config.port;
 
-const server = app.listen(PORT, () => {
-  console.log(`===============================================`);
-  console.log(`🚀 Society Complaint Triage API running on:`);
-  console.log(`   http://localhost:${PORT}`);
-  console.log(`   Health check: http://localhost:${PORT}/api/health`);
-  console.log(`   Complaints API: http://localhost:${PORT}/api/complaints`);
-  console.log(`===============================================`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`===============================================`);
+    console.log(`🚀 Society Complaint Triage API running on:`);
+    console.log(`   http://localhost:${PORT}`);
+    console.log(`   Health check: http://localhost:${PORT}/api/health`);
+    console.log(`   Complaints API: http://localhost:${PORT}/api/complaints`);
+    console.log(`===============================================`);
+  });
+}
 
-module.exports = { app, server };
+module.exports = app;
+
